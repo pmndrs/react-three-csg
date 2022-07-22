@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 import React, { createContext, forwardRef, useMemo, useContext, useEffect, useRef, useState } from 'react'
 import { ReactThreeFiber, extend, useFrame } from '@react-three/fiber'
-import { mergeRefs } from 'react-merge-refs'
+import mergeRefs from 'react-merge-refs'
 /** @ts-ignore */
 import * as CSG from './packages/three-bvh-csg'
 /** @ts-ignore */

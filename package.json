@@ -77,7 +77,7 @@
   },
   "homepage": "https://github.com/pmndrs/react-three-csg#readme",
   "dependencies": {
-    "react-merge-refs": "^2.0.1",
+    "react-merge-refs": "^1.1.0",
     "three-mesh-bvh": "^0.5.14"
   }
 }
