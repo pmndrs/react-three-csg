@@ -1,13 +1,13 @@
+<p>
+  <a href="https://codesandbox.io/s/eckvc1"><img width="20%" src="https://codesandbox.io/api/v1/sandboxes/eckvc1/screenshot.png" alt="Demo"/></a>
+  <a href="https://codesandbox.io/s/mw0dtc"><img width="20%" src="https://codesandbox.io/api/v1/sandboxes/mw0dtc/screenshot.png" alt="Demo"/></a>
+</p>
+
 ```shell
 yarn add @react-three/csg
 ```
 
 A small, abstraction around https://github.com/gkjohnson/three-bvh-csg. It is not feature complete!
-
-<p>
-  <a href="https://codesandbox.io/s/eckvc1"><img width="20%" src="https://codesandbox.io/api/v1/sandboxes/eckvc1/screenshot.png" alt="Demo"/></a>
-  <a href="https://codesandbox.io/s/mw0dtc"><img width="20%" src="https://codesandbox.io/api/v1/sandboxes/mw0dtc/screenshot.png" alt="Demo"/></a>
-</p>
 
 You have 4 operations:
 
