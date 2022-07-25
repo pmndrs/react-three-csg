@@ -1,11 +1,42 @@
 import * as THREE from 'three'
-import React, { createContext, forwardRef, useMemo, useContext, useEffect, useRef, useState } from 'react'
+import React, {
+  createContext,
+  forwardRef,
+  useMemo,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react'
 import { ReactThreeFiber, extend, useFrame } from '@react-three/fiber'
 import mergeRefs from 'react-merge-refs'
 /** @ts-ignore */
 import * as CSG from './packages/three-bvh-csg'
 /** @ts-ignore */
 export * from './packages/three-bvh-csg'
+
+type Brush = THREE.Mesh & {
+  a: any
+  b: any
+  needsUpdate: boolean
+}
+
+type BrushProps = JSX.IntrinsicElements['mesh'] & {
+  a?: boolean
+  b?: boolean
+}
+
+type OperationProps = JSX.IntrinsicElements['mesh'] & {
+  a?: boolean
+  b?: boolean
+  op: number
+}
+
+type Api = {
+  parent: Api
+  getRef: () => Brush
+  update: (force?: boolean) => void
+}
 
 declare global {
   namespace JSX {
@@ -15,35 +46,19 @@ declare global {
   }
 }
 
-type BrushType = JSX.IntrinsicElements['mesh'] & {
-  a?: boolean
-  b?: boolean
-}
+const context = createContext<Api>(null!)
 
-type OperationType = JSX.IntrinsicElements['mesh'] & {
-  a?: boolean
-  b?: boolean
-  type: any
-}
-
-type ApiType = {
-  getRef: () => React.MutableRefObject<THREE.Mesh & { a: any; b: any }>
-}
-
-const context = createContext<ApiType>(null!)
-
-export const Brush = forwardRef(({ a, b, children, ...props }: BrushType, fref) => {
+export const Brush = forwardRef(({ a, b, children, ...props }: BrushProps, fref: React.ForwardedRef<Brush>) => {
   extend({ Brush: CSG.Brush })
-  const ref = useRef<THREE.Mesh & { a: any; b: any }>(null!)
+  const ref = useRef<Brush>(null!)
   const parent = useContext(context)
+
   useEffect(() => {
     // If this brush does not have geometry directly traverse it
     if (!ref.current.geometry || !ref.current.geometry.attributes?.position) {
-      let brush: THREE.Mesh | null = null
-      ref.current.traverse(
-        (obj: THREE.Object3D) => obj !== ref.current && obj instanceof CSG.Brush && (brush = obj as THREE.Mesh)
-      )
-      if (brush) ref.current.geometry = (brush as THREE.Mesh).geometry
+      let brush: THREE.Mesh = null!
+      ref.current.traverse((obj) => obj !== ref.current && obj instanceof CSG.Brush && (brush = obj as THREE.Mesh))
+      if (brush) ref.current.geometry = brush.geometry
     }
 
     // Subscribe to the operation above
@@ -52,7 +67,23 @@ export const Brush = forwardRef(({ a, b, children, ...props }: BrushType, fref) 
       // @ts-ignore
       if (parentRef) parentRef[a ? 'a' : 'b'] = ref.current
     }
+  }, [])
+
+  const mounted = useRef(false)
+  useEffect(() => {
+    if (mounted.current && parent) parent.update(true)
   })
+  useEffect(() => {
+    mounted.current = true
+  }, [])
+
+  useFrame(() => {
+    if (parent && ref.current.needsUpdate) {
+      ref.current.needsUpdate = false
+      parent.update(true)
+    }
+  })
+
   return (
     <brush visible={!(a || b)} ref={mergeRefs([fref, ref])} geometry={undefined} {...props}>
       {children}
@@ -60,68 +91,66 @@ export const Brush = forwardRef(({ a, b, children, ...props }: BrushType, fref) 
   )
 })
 
-const Operation = forwardRef(({ a, b, children, type, ...props }: OperationType, fref) => {
+const Operation = forwardRef(({ a, b, children, op, ...props }: OperationProps, fref: React.ForwardedRef<Brush>) => {
   const parent = useContext(context)
-  const ref = useRef<THREE.Mesh & { a: any; b: any }>(null!)
+  const ref = useRef<Brush>(null!)
   const [target] = useState(() => new CSG.Brush())
   const [csgEvaluator] = useState(() => new CSG.Evaluator())
 
-  const update = () => {
-    const nodeA = ref.current.a
-    const nodeB = ref.current.b
-    if (nodeA && nodeB) {
-      csgEvaluator.useGroups = false
-      try {
-        if (target.geometry) {
-          // Dispose previous geometry
-          target.geometry.dispose()
-          target.geometry = new THREE.BufferGeometry()
+  const api = useMemo(
+    () => ({
+      parent,
+      getRef: () => ref.current,
+      update: (force?: boolean) => {
+        const nodeA = ref.current.a
+        const nodeB = ref.current.b
+        if (nodeA && nodeB) {
+          ref.current.matrixWorld.identity()
+          nodeA.updateMatrixWorld()
+          nodeB.updateMatrixWorld()
+          csgEvaluator.useGroups = false
+          try {
+            if (target.geometry) {
+              // Dispose previous geometry
+              target.geometry.dispose()
+              target.geometry = new THREE.BufferGeometry()
+            }
+            ref.current.geometry = csgEvaluator.evaluate(nodeA, nodeB, op, target).geometry
+          } catch (e) {
+            console.log(e)
+          }
+          if (force) {
+            let cur = parent
+            while (cur) {
+              cur.update()
+              cur = cur.parent
+            }
+          }
         }
-        ref.current.geometry = csgEvaluator.evaluate(nodeA, nodeB, type, target).geometry
-      } catch (e) {
-        console.log(e)
-      }
-    }
-  }
-
-  const m1 = new THREE.Matrix4()
-  const m2 = new THREE.Matrix4()
-  useFrame(() => {
-    const nodeA = ref.current.a
-    const nodeB = ref.current.b
-    // If A or B changed in position, rotation or size, update CSG
-    if (nodeA && nodeB && (!m1.equals(nodeA.matrixWorld) || !m2.equals(nodeB.matrixWorld))) {
-      m1.copy(nodeA.matrixWorld)
-      m2.copy(nodeB.matrixWorld)
-      update()
-    }
-  })
+      },
+    }),
+    [parent]
+  )
 
   useEffect(() => {
-    // Fetch operation B and B
-    const nodeA = ref.current.a
-    const nodeB = ref.current.b
-    if (nodeA && nodeB) {
-      // Update their matrix world
-      nodeA.updateMatrixWorld()
-      nodeB.updateMatrixWorld()
+    // If an operation above this one exists, make this one act as a brush and subscribe to the op
+    if (parent && (a || b)) {
+      const parentRef = parent.getRef()
+      // @ts-ignore
+      if (parentRef) parentRef[a ? 'a' : 'b'] = ref.current
+    }
+    api.update(true)
+  })
 
-      // If an operation above this one exists, make this one act as a brush and subscribe to the op
-      if (parent && (a || b)) {
-        const parentRef = parent.getRef()
-        // @ts-ignore
-        if (parentRef) parentRef[a ? 'a' : 'b'] = ref.current
-      }
-
-      update()
+  useFrame(() => {
+    if (ref.current.needsUpdate) {
+      ref.current.needsUpdate = false
+      api.update(true)
     }
   })
 
-  // Context api
-  const api = useMemo(() => ({ getRef: () => ref.current }), [])
-
   return (
-    <context.Provider value={api as any}>
+    <context.Provider value={api}>
       <brush visible={parent && !(a || b)} ref={mergeRefs([fref, ref])} {...props}>
         {children}
       </brush>
@@ -129,7 +158,15 @@ const Operation = forwardRef(({ a, b, children, type, ...props }: OperationType,
   )
 })
 
-export const Subtraction = forwardRef((props, fref) => <Operation ref={fref} {...props} type={CSG.SUBTRACTION} />)
-export const Addition = forwardRef((props, fref) => <Operation ref={fref} {...props} type={CSG.ADDITION} />)
-export const Difference = forwardRef((props, fref) => <Operation ref={fref} {...props} type={CSG.DIFFERENCE} />)
-export const Intersection = forwardRef((props, fref) => <Operation ref={fref} {...props} type={CSG.INTERSECTION} />)
+export const Subtraction = forwardRef((props: THREE.Mesh, fref: React.ForwardedRef<Brush>) => (
+  <Operation ref={fref} {...props} op={CSG.SUBTRACTION} />
+))
+export const Addition = forwardRef((props: THREE.Mesh, fref: React.ForwardedRef<Brush>) => (
+  <Operation ref={fref} {...props} op={CSG.ADDITION} />
+))
+export const Difference = forwardRef((props: THREE.Mesh, fref: React.ForwardedRef<Brush>) => (
+  <Operation ref={fref} {...props} op={CSG.DIFFERENCE} />
+))
+export const Intersection = forwardRef((props: THREE.Mesh, fref: React.ForwardedRef<Brush>) => (
+  <Operation ref={fref} {...props} op={CSG.INTERSECTION} />
+))
