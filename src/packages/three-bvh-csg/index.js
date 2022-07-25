@@ -900,7 +900,7 @@ class TriangleSplitter {
           }
         }
       } else if (intersects === 3) {
-        console.warn('TriangleClipper: Coplanar clip not handled')
+        //console.warn('TriangleClipper: Coplanar clip not handled')
       }
     }
   }
@@ -1901,7 +1901,7 @@ function getTriangleDefinitions(...triangles) {
 }
 
 function logTriangleDefinitions(...triangles) {
-  console.log(getTriangleDefinitions(...triangles).join(',\n'))
+  //console.log(getTriangleDefinitions(...triangles).join(',\n'))
 }
 
 function generateRandomTriangleColors(geometry) {
