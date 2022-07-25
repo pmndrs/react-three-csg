@@ -53,11 +53,11 @@ function Shape() {
     brush.current.needsUpdate = true
   })
   return (
-      <Subtraction castShadow receiveShadow>
-        <Brush a rotation={[0, Math.PI / 2, 0]} position={[-0.35, 0.4, 0.4]}>
-          <boxGeometry />
-        </Brush>
-        <Brush b ref={brush} position={[-0.35, 0.4, 0.4]}>
-          <boxGeometry />
-        </Brush>
-```        
+    <Subtraction castShadow receiveShadow>
+      <Brush a rotation={[0, Math.PI / 2, 0]} position={[-0.35, 0.4, 0.4]}>
+        <boxGeometry />
+      </Brush>
+      <Brush b ref={brush} position={[-0.35, 0.4, 0.4]}>
+        <boxGeometry />
+      </Brush>
+```
