@@ -28,7 +28,7 @@ function Model() {
     <Subtraction>
       <Subtraction a>
         <Brush a scale={1.5} position={[0, -1.04, 0]} geometry={nodes.bunny.geometry} />
-        <Brush b ref={mesh} position={[0.5, -0.75, 1]}>
+        <Brush b position={[0.5, -0.75, 1]}>
           <sphereGeometry />
         </Brush>
       </Subtraction>
