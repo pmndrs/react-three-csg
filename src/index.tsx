@@ -4,6 +4,7 @@ import React, {
   forwardRef,
   useMemo,
   useContext,
+  useLayoutEffect,
   useEffect,
   useRef,
   useState,
@@ -34,7 +35,7 @@ type OperationProps = JSX.IntrinsicElements['mesh'] & {
 
 type Api = {
   parent: Api
-  getRef: () => Brush
+  slots: [Brush | null, Brush | null]
   update: (force?: boolean) => void
 }
 
@@ -53,7 +54,7 @@ export const Brush = forwardRef(({ a, b, children, ...props }: BrushProps, fref:
   const ref = useRef<Brush>(null!)
   const parent = useContext(context)
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     // If this brush does not have geometry directly traverse it
     if (!ref.current.geometry || !ref.current.geometry.attributes?.position) {
       let brush: THREE.Mesh = null!
@@ -63,9 +64,7 @@ export const Brush = forwardRef(({ a, b, children, ...props }: BrushProps, fref:
 
     // Subscribe to the operation above
     if (parent && (a || b)) {
-      const parentRef = parent.getRef()
-      // @ts-ignore
-      if (parentRef) parentRef[a ? 'a' : 'b'] = ref.current
+      parent.slots[a ? 0 : 1] = ref.current
     }
   }, [])
 
@@ -85,7 +84,13 @@ export const Brush = forwardRef(({ a, b, children, ...props }: BrushProps, fref:
   })
 
   return (
-    <brush visible={!(a || b)} ref={mergeRefs([fref, ref])} geometry={undefined} {...props}>
+    <brush
+      traverse={(cb) => cb(ref.current)}
+      visible={!(a || b)}
+      ref={mergeRefs([fref, ref])}
+      geometry={undefined}
+      {...props}
+    >
       {children}
     </brush>
   )
@@ -96,15 +101,16 @@ const Operation = forwardRef(({ a, b, children, op, ...props }: OperationProps, 
   const ref = useRef<Brush>(null!)
   const [target] = useState(() => new CSG.Brush())
   const [csgEvaluator] = useState(() => new CSG.Evaluator())
+  const [slots] = useState<[Brush | null, Brush | null]>([null, null])
 
   const api = useMemo(
     () => ({
       parent,
-      getRef: () => ref.current,
+      slots,
       update: (force?: boolean) => {
-        const nodeA = ref.current.a
-        const nodeB = ref.current.b
-        if (nodeA && nodeB) {
+        const nodeA = slots[0]
+        const nodeB = slots[1]
+        if (nodeA && nodeB && ref.current) {          
           ref.current.matrixWorld.identity()
           nodeA.updateMatrixWorld()
           nodeB.updateMatrixWorld()
@@ -132,15 +138,13 @@ const Operation = forwardRef(({ a, b, children, op, ...props }: OperationProps, 
     [parent]
   )
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     // If an operation above this one exists, make this one act as a brush and subscribe to the op
     if (parent && (a || b)) {
-      const parentRef = parent.getRef()
-      // @ts-ignore
-      if (parentRef) parentRef[a ? 'a' : 'b'] = ref.current
+      parent.slots[a ? 0 : 1] = ref.current
     }
     api.update(true)
-  })
+  }, [])
 
   useFrame(() => {
     if (ref.current.needsUpdate) {
@@ -151,7 +155,7 @@ const Operation = forwardRef(({ a, b, children, op, ...props }: OperationProps, 
 
   return (
     <context.Provider value={api}>
-      <brush visible={parent && !(a || b)} ref={mergeRefs([fref, ref])} {...props}>
+      <brush traverse={(cb) => cb(ref.current)} visible={parent && !(a || b)} ref={mergeRefs([fref, ref])} {...props}>
         {children}
       </brush>
     </context.Provider>
