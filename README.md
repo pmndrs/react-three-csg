@@ -17,11 +17,11 @@ You have 4 operations:
 - Difference
 - Intersection
 
-Each can take a `<Brush>`, which is like a THREE.Mesh, it needs a geometry. A brush must be either slot `a` or `b` (first & second operand), which you need to define as a prop.
+Each needs to fill two slots with a `<Brush>`, which is like a THREE.Mesh and needs a geometry. A brush must be either slot `a` or `b` (first & second operand), which you need to define as a prop.
 
-If you nest operations, the operation itself becomes a brush and must also define a slot.
+If you nest operations, the operation itself becomes a brush and must also define its slot.
 
-The outmost operation will yield a buffergeometry, so you can use it in a mesh, an instancedMesh, or whatever needs a goemetry to function.
+The outmost operation will yield a buffergeometry, so you can use it in a mesh, an instancedMesh, or whatever needs a geometry to function.
 
 ```jsx
 import { Brush, Subtraction, Addition, Difference, Intersection } from '@react-three/csg'
