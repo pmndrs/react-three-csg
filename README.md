@@ -20,23 +20,27 @@ Each can take a `<Brush>`, which is like a THREE.Mesh, it needs a geometry. A br
 
 If you nest operations, the operation itself becomes a brush and must also define a slot.
 
+The outmost operation will yield a buffergeometry, so you can use it in a mesh, an instancedMesh, or whatever needs a goemetry to function.
+
 ```jsx
 import { Brush, Subtraction, Addition, Difference, Intersection } from '@react-three/csg'
 
 function Model() {
   return (
-    <Subtraction>
-      <Subtraction a>
-        <Brush a scale={1.5} position={[0, -1.04, 0]} geometry={nodes.bunny.geometry} />
-        <Brush b position={[0.5, -0.75, 1]}>
+    <mesh>
+      <Subtraction>
+        <Subtraction a>
+          <Brush a scale={1.5} position={[0, -1.04, 0]} geometry={nodes.bunny.geometry} />
+          <Brush b position={[0.5, -0.75, 1]}>
+            <sphereGeometry />
+          </Brush>
+        </Subtraction>
+        <Brush b position={[-1, 1, 1]}>
           <sphereGeometry />
         </Brush>
       </Subtraction>
-      <Brush b position={[-1, 1, 1]}>
-        <sphereGeometry />
-      </Brush>
       <meshNormalMaterial />
-    </Subtraction>
+    </mesh>
   )
 }
 ```
@@ -53,11 +57,12 @@ function Shape() {
     brush.current.needsUpdate = true
   })
   return (
-    <Subtraction castShadow receiveShadow>
-      <Brush a rotation={[0, Math.PI / 2, 0]} position={[-0.35, 0.4, 0.4]}>
-        <boxGeometry />
-      </Brush>
-      <Brush b ref={brush} position={[-0.35, 0.4, 0.4]}>
-        <boxGeometry />
-      </Brush>
+    <mesh>
+      <Subtraction castShadow receiveShadow>
+        <Brush a rotation={[0, Math.PI / 2, 0]} position={[-0.35, 0.4, 0.4]}>
+          <boxGeometry />
+        </Brush>
+        <Brush b ref={brush} position={[-0.35, 0.4, 0.4]}>
+          <boxGeometry />
+        </Brush>
 ```

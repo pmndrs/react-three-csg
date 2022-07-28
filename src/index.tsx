@@ -51,20 +51,22 @@ const context = createContext<Api>(null!)
 
 export const Brush = forwardRef(({ a, b, children, ...props }: BrushProps, fref: React.ForwardedRef<Brush>) => {
   extend({ Brush: CSG.Brush })
-  const ref = useRef<Brush>(null!)
+  const refBrush = useRef<Brush>(null!)
   const parent = useContext(context)
 
   useLayoutEffect(() => {
     // If this brush does not have geometry directly traverse it
-    if (!ref.current.geometry || !ref.current.geometry.attributes?.position) {
+    if (!refBrush.current.geometry || !refBrush.current.geometry.attributes?.position) {
       let brush: THREE.Mesh = null!
-      ref.current.traverse((obj) => obj !== ref.current && obj instanceof CSG.Brush && (brush = obj as THREE.Mesh))
-      if (brush) ref.current.geometry = brush.geometry
+      refBrush.current.traverse(
+        (obj) => obj !== refBrush.current && obj instanceof CSG.Brush && (brush = obj as THREE.Mesh)
+      )
+      if (brush) refBrush.current.geometry = brush.geometry
     }
 
     // Subscribe to the operation above
     if (parent && (a || b)) {
-      parent.slots[a ? 0 : 1] = ref.current
+      parent.slots[a ? 0 : 1] = refBrush.current
     }
   }, [])
 
@@ -77,20 +79,14 @@ export const Brush = forwardRef(({ a, b, children, ...props }: BrushProps, fref:
   }, [])
 
   useFrame(() => {
-    if (parent && ref.current.needsUpdate) {
-      ref.current.needsUpdate = false
+    if (parent && refBrush.current.needsUpdate) {
+      refBrush.current.needsUpdate = false
       parent.update(true)
     }
   })
 
   return (
-    <brush
-      traverse={(cb) => cb(ref.current)}
-      visible={!(a || b)}
-      ref={mergeRefs([fref, ref])}
-      geometry={undefined}
-      {...props}
-    >
+    <brush ref={mergeRefs([fref, refBrush])} geometry={undefined} {...props}>
       {children}
     </brush>
   )
@@ -98,8 +94,9 @@ export const Brush = forwardRef(({ a, b, children, ...props }: BrushProps, fref:
 
 const Operation = forwardRef(({ a, b, children, op, ...props }: OperationProps, fref: React.ForwardedRef<Brush>) => {
   const parent = useContext(context)
-  const ref = useRef<Brush>(null!)
-  const [target] = useState(() => new CSG.Brush())
+  const refBrush = useRef<Brush>(null!)
+  const refGeom = useRef<THREE.BufferGeometry>(null!)
+  const [target] = useState<Brush>(() => new CSG.Brush())
   const [csgEvaluator] = useState(() => new CSG.Evaluator())
   const [slots] = useState<[Brush | null, Brush | null]>([null, null])
 
@@ -110,18 +107,36 @@ const Operation = forwardRef(({ a, b, children, op, ...props }: OperationProps, 
       update: (force?: boolean) => {
         const nodeA = slots[0]
         const nodeB = slots[1]
-        if (nodeA && nodeB && ref.current) {          
-          ref.current.matrixWorld.identity()
+        if (nodeA && nodeB && refBrush.current) {
+          refBrush.current.matrixWorld.identity()
           nodeA.updateMatrixWorld()
           nodeB.updateMatrixWorld()
           csgEvaluator.useGroups = false
+
+          function dispose(geometry: THREE.BufferGeometry) {
+            geometry.attributes = {}
+            geometry.groups = []
+            geometry.boundingBox = null
+            geometry.boundingSphere = null
+            geometry.drawRange = { start: 0, count: Infinity }
+            geometry.dispose()
+          }
+
           try {
             if (target.geometry) {
               // Dispose previous geometry
-              target.geometry.dispose()
+              dispose(target.geometry)
+              if (!parent) dispose(refGeom.current)
               target.geometry = new THREE.BufferGeometry()
             }
-            ref.current.geometry = csgEvaluator.evaluate(nodeA, nodeB, op, target).geometry
+
+            const geometry = csgEvaluator.evaluate(nodeA, nodeB, op, target).geometry
+            if (parent) refBrush.current.geometry = geometry
+            else {
+              refGeom.current.attributes = geometry.attributes
+              refGeom.current.groups = geometry.groups
+              refGeom.current.drawRange = geometry.drawRange
+            }
           } catch (e) {
             console.log(e)
           }
@@ -141,23 +156,25 @@ const Operation = forwardRef(({ a, b, children, op, ...props }: OperationProps, 
   useLayoutEffect(() => {
     // If an operation above this one exists, make this one act as a brush and subscribe to the op
     if (parent && (a || b)) {
-      parent.slots[a ? 0 : 1] = ref.current
+      parent.slots[a ? 0 : 1] = refBrush.current
     }
     api.update(true)
   }, [])
 
   useFrame(() => {
-    if (ref.current.needsUpdate) {
-      ref.current.needsUpdate = false
+    if (refBrush.current.needsUpdate) {
+      refBrush.current.needsUpdate = false
       api.update(true)
     }
   })
 
   return (
     <context.Provider value={api}>
-      <brush traverse={(cb) => cb(ref.current)} visible={parent && !(a || b)} ref={mergeRefs([fref, ref])} {...props}>
-        {children}
-      </brush>
+      <bufferGeometry ref={refGeom}>
+        <brush ref={mergeRefs([fref, refBrush])} {...props}>
+          {children}
+        </brush>
+      </bufferGeometry>
     </context.Provider>
   )
 })
