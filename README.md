@@ -1,6 +1,7 @@
 <p>
-  <a href="https://codesandbox.io/s/eckvc1"><img width="20%" src="https://codesandbox.io/api/v1/sandboxes/eckvc1/screenshot.png" alt="Demo"/></a>
-  <a href="https://codesandbox.io/s/mw0dtc"><img width="20%" src="https://codesandbox.io/api/v1/sandboxes/mw0dtc/screenshot.png" alt="Demo"/></a>
+  <a href="https://codesandbox.io/s/eckvc1"><img width="20%" src="https://codesandbox.io/api/v1/sandboxes/eckvc1/screenshot.png" alt="Runtime"/></a>
+  <a href="https://codesandbox.io/s/mw0dtc"><img width="20%" src="https://codesandbox.io/api/v1/sandboxes/mw0dtc/screenshot.png" alt="Physics"/></a>
+  <a href="https://codesandbox.io/s/k3ly88"><img width="20%" src="https://codesandbox.io/api/v1/sandboxes/k3ly88/screenshot.png" alt="Instances"/></a>
 </p>
 
 ```shell
