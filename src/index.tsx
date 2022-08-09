@@ -135,8 +135,10 @@ const Operation = forwardRef(
               const result = csgEvaluator.evaluate(nodeA, nodeB, op, target)
               const geometry = result.geometry
 
-              if (parent) refBrush.current.geometry = geometry
-              else {
+              if (parent) {
+                refBrush.current.geometry = geometry
+                if (csgEvaluator.useGroups) refBrush.current.material = result.material
+              } else {
                 // Overwrite the higher up meshs material to use material groups
                 if (csgEvaluator.useGroups && (refGeom.current as any)?.__r3f?.parent)
                   (refGeom.current as any).__r3f.parent.material = result.material
