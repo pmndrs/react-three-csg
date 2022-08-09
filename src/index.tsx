@@ -30,6 +30,7 @@ type BrushProps = JSX.IntrinsicElements['mesh'] & {
 type OperationProps = JSX.IntrinsicElements['mesh'] & {
   a?: boolean
   b?: boolean
+  useGroups?: boolean
   op: number
 }
 
@@ -92,92 +93,99 @@ export const Brush = forwardRef(({ a, b, children, ...props }: BrushProps, fref:
   )
 })
 
-const Operation = forwardRef(({ a, b, children, op, ...props }: OperationProps, fref: React.ForwardedRef<Brush>) => {
-  const parent = useContext(context)
-  const refBrush = useRef<Brush>(null!)
-  const refGeom = useRef<THREE.BufferGeometry>(null!)
-  const [target] = useState<Brush>(() => new CSG.Brush())
-  const [csgEvaluator] = useState(() => new CSG.Evaluator())
-  const [slots] = useState<[Brush | null, Brush | null]>([null, null])
+const Operation = forwardRef(
+  ({ a, b, children, op, useGroups = false, ...props }: OperationProps, fref: React.ForwardedRef<Brush>) => {
+    const parent = useContext(context)
+    const refBrush = useRef<Brush>(null!)
+    const refGeom = useRef<THREE.BufferGeometry>(null!)
+    const [target] = useState<Brush>(() => new CSG.Brush())
+    const [csgEvaluator] = useState(() => new CSG.Evaluator())
+    const [slots] = useState<[Brush | null, Brush | null]>([null, null])
 
-  const api = useMemo(
-    () => ({
-      parent,
-      slots,
-      update: (force?: boolean) => {
-        const nodeA = slots[0]
-        const nodeB = slots[1]
-        if (nodeA && nodeB && refBrush.current) {
-          refBrush.current.matrixWorld.identity()
-          nodeA.updateMatrixWorld()
-          nodeB.updateMatrixWorld()
-          csgEvaluator.useGroups = false
+    const api = useMemo(
+      () => ({
+        parent,
+        slots,
+        update: (force?: boolean) => {
+          const nodeA = slots[0]
+          const nodeB = slots[1]
+          if (nodeA && nodeB && refBrush.current) {
+            refBrush.current.matrixWorld.identity()
+            nodeA.updateMatrixWorld()
+            nodeB.updateMatrixWorld()
+            csgEvaluator.useGroups = useGroups
 
-          function dispose(geometry: THREE.BufferGeometry) {
-            geometry.attributes = {}
-            geometry.groups = []
-            geometry.boundingBox = null
-            geometry.boundingSphere = null
-            geometry.drawRange = { start: 0, count: Infinity }
-            geometry.dispose()
-          }
-
-          try {
-            if (target.geometry) {
-              // Dispose previous geometry
-              dispose(target.geometry)
-              if (!parent) dispose(refGeom.current)
-              target.geometry = new THREE.BufferGeometry()
+            function dispose(geometry: THREE.BufferGeometry) {
+              geometry.attributes = {}
+              geometry.groups = []
+              geometry.boundingBox = null
+              geometry.boundingSphere = null
+              geometry.drawRange = { start: 0, count: Infinity }
+              geometry.dispose()
             }
 
-            const geometry = csgEvaluator.evaluate(nodeA, nodeB, op, target).geometry
-            if (parent) refBrush.current.geometry = geometry
-            else {
-              refGeom.current.attributes = geometry.attributes
-              refGeom.current.groups = geometry.groups
-              refGeom.current.drawRange = geometry.drawRange
-            }
-          } catch (e) {
-            console.log(e)
-          }
-          if (force) {
-            let cur = parent
-            while (cur) {
-              cur.update()
-              cur = cur.parent
-            }
-          }
-        }
-      },
-    }),
-    [parent]
-  )
+            try {
+              if (target.geometry) {
+                // Dispose previous geometry
+                dispose(target.geometry)
+                if (!parent) dispose(refGeom.current)
+                target.geometry = new THREE.BufferGeometry()
+              }
 
-  useLayoutEffect(() => {
-    // If an operation above this one exists, make this one act as a brush and subscribe to the op
-    if (parent && (a || b)) {
-      parent.slots[a ? 0 : 1] = refBrush.current
-    }
-    api.update(true)
-  }, [])
+              const result = csgEvaluator.evaluate(nodeA, nodeB, op, target)
+              const geometry = result.geometry
 
-  useFrame(() => {
-    if (refBrush.current.needsUpdate) {
-      refBrush.current.needsUpdate = false
+              if (parent) refBrush.current.geometry = geometry
+              else {
+                // Overwrite the higher up meshs material to use material groups
+                if (csgEvaluator.useGroups && (refGeom.current as any)?.__r3f?.parent)
+                  (refGeom.current as any).__r3f.parent.material = result.material
+                refGeom.current.attributes = geometry.attributes
+                refGeom.current.groups = geometry.groups
+                refGeom.current.drawRange = geometry.drawRange
+              }
+            } catch (e) {
+              console.log(e)
+            }
+            if (force) {
+              let cur = parent
+              while (cur) {
+                cur.update()
+                cur = cur.parent
+              }
+            }
+          }
+        },
+      }),
+      [parent, useGroups]
+    )
+
+    useLayoutEffect(() => {
+      // If an operation above this one exists, make this one act as a brush and subscribe to the op
+      if (parent && (a || b)) {
+        parent.slots[a ? 0 : 1] = refBrush.current
+      }
       api.update(true)
-    }
-  })
+    }, [api])
 
-  return (
-    <context.Provider value={api}>
-      <bufferGeometry ref={refGeom}>
-        <brush ref={mergeRefs([fref, refBrush])} {...props}>
-          {children}
-        </brush>
-      </bufferGeometry>
-    </context.Provider>
-  )
-})
+    useFrame(() => {
+      if (refBrush.current.needsUpdate) {
+        refBrush.current.needsUpdate = false
+        api.update(true)
+      }
+    })
+
+    return (
+      <context.Provider value={api}>
+        <bufferGeometry ref={refGeom}>
+          <brush ref={mergeRefs([fref, refBrush])} {...props}>
+            {children}
+          </brush>
+        </bufferGeometry>
+      </context.Provider>
+    )
+  }
+)
 
 export const Subtraction = forwardRef((props: THREE.Mesh, fref: React.ForwardedRef<Brush>) => (
   <Operation ref={fref} {...props} op={CSG.SUBTRACTION} />
