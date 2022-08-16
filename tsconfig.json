@@ -14,5 +14,5 @@
     "removeComments": false,
     "baseUrl": "."
   },
-  "include": ["src"]
+  "include": ["src", ".storybook/stories"]
 }
