@@ -16,27 +16,30 @@ import * as CSG from './packages/three-bvh-csg'
 /** @ts-ignore */
 export * from './packages/three-bvh-csg'
 
-type Brush = THREE.Mesh & {
+export type BrushRef = THREE.Mesh & {
   a: any
   b: any
   needsUpdate: boolean
 }
 
-type BrushProps = JSX.IntrinsicElements['mesh'] & {
+export type BrushProps = JSX.IntrinsicElements['mesh'] & {
   a?: boolean
   b?: boolean
 }
 
-type OperationProps = JSX.IntrinsicElements['mesh'] & {
+type SharedOperationProps = JSX.IntrinsicElements['mesh'] & {
   a?: boolean
   b?: boolean
   useGroups?: boolean
+}
+
+type OperationProps = SharedOperationProps & {
   op: number
 }
 
 type Api = {
   parent: Api
-  slots: [Brush | null, Brush | null]
+  slots: [BrushRef | null, BrushRef | null]
   update: (force?: boolean) => void
 }
 
@@ -50,9 +53,9 @@ declare global {
 
 const context = createContext<Api>(null!)
 
-export const Brush = forwardRef(({ a, b, children, ...props }: BrushProps, fref: React.ForwardedRef<Brush>) => {
+export const Brush = forwardRef(({ a, b, children, ...props }: BrushProps, fref: React.ForwardedRef<BrushRef>) => {
   extend({ Brush: CSG.Brush })
-  const refBrush = useRef<Brush>(null!)
+  const refBrush = useRef<BrushRef>(null!)
   const parent = useContext(context)
 
   useLayoutEffect(() => {
@@ -94,13 +97,13 @@ export const Brush = forwardRef(({ a, b, children, ...props }: BrushProps, fref:
 })
 
 const Operation = forwardRef(
-  ({ a, b, children, op, useGroups = false, ...props }: OperationProps, fref: React.ForwardedRef<Brush>) => {
+  ({ a, b, children, op, useGroups = false, ...props }: OperationProps, fref: React.ForwardedRef<BrushRef>) => {
     const parent = useContext(context)
-    const refBrush = useRef<Brush>(null!)
+    const refBrush = useRef<BrushRef>(null!)
     const refGeom = useRef<THREE.BufferGeometry>(null!)
-    const [target] = useState<Brush>(() => new CSG.Brush())
+    const [target] = useState<BrushRef>(() => new CSG.Brush())
     const [csgEvaluator] = useState(() => new CSG.Evaluator())
-    const [slots] = useState<[Brush | null, Brush | null]>([null, null])
+    const [slots] = useState<[BrushRef | null, BrushRef | null]>([null, null])
 
     const api = useMemo(
       () => ({
@@ -189,15 +192,22 @@ const Operation = forwardRef(
   }
 )
 
-export const Subtraction = forwardRef((props: THREE.Mesh, fref: React.ForwardedRef<Brush>) => (
-  <Operation ref={fref} {...props} op={CSG.SUBTRACTION} />
+export type SubtractionProps = SharedOperationProps
+export const Subtraction = forwardRef((props: SubtractionProps, fref: React.ForwardedRef<BrushRef>) => (
+  <Operation {...props} ref={fref} op={CSG.SUBTRACTION} />
 ))
-export const Addition = forwardRef((props: THREE.Mesh, fref: React.ForwardedRef<Brush>) => (
-  <Operation ref={fref} {...props} op={CSG.ADDITION} />
+
+export type AdditionProps = SharedOperationProps
+export const Addition = forwardRef((props: AdditionProps, fref: React.ForwardedRef<BrushRef>) => (
+  <Operation {...props} ref={fref} op={CSG.ADDITION} />
 ))
-export const Difference = forwardRef((props: THREE.Mesh, fref: React.ForwardedRef<Brush>) => (
-  <Operation ref={fref} {...props} op={CSG.DIFFERENCE} />
+
+export type DifferenceProps = SharedOperationProps
+export const Difference = forwardRef((props: DifferenceProps, fref: React.ForwardedRef<BrushRef>) => (
+  <Operation {...props} ref={fref} op={CSG.DIFFERENCE} />
 ))
-export const Intersection = forwardRef((props: THREE.Mesh, fref: React.ForwardedRef<Brush>) => (
-  <Operation ref={fref} {...props} op={CSG.INTERSECTION} />
+
+export type IntersectionProps = SharedOperationProps
+export const Intersection = forwardRef((props: IntersectionProps, fref: React.ForwardedRef<BrushRef>) => (
+  <Operation {...props} ref={fref} op={CSG.INTERSECTION} />
 ))
