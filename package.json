@@ -1,7 +1,7 @@
 {
   "name": "@react-three/csg",
   "version": "1.1.1",
-  "description": "non gratum anus rodentum",
+  "description": "Constructive solid geometry for React",
   "main": "dist/index.cjs",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -26,17 +26,17 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/pmndrs/tunnel-rat.git"
+    "url": "git+https://github.com/pmndrs/react-three-csg.git"
   },
   "keywords": [
-    "react",
-    "portal",
-    "tunnel"
+    "csg",
+    "threejs",
+    "3d"
   ],
   "author": "Paul Henschel",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/pmndrs/tunnel-rat/issues"
+    "url": "https://github.com/pmndrs/react-three-csg/issues"
   },
   "devDependencies": {
     "@babel/core": "7.16.0",
