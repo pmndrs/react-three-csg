@@ -8,6 +8,7 @@ export const parameters = {
       date: /Date$/,
     },
   },
+  layout: 'fullscreen',
   options: {
     storySort: {
       order: ['Operations', ['Addition', 'Subtraction', 'Intersection', 'Difference'], 'Advanced'],
