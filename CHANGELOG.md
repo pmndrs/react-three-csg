@@ -1,10 +1,16 @@
 # @react-three/fiber
 
+## 1.1.3
+
+### Patch Changes
+
+- 21f42fe: fix: remove storybook from tsconfig.json, removes unwanted storybook type declarations from dist
+
 ## 1.1.2
 
 ### Patch Changes
 
-- 02c4423: fix: operation component props causing typescript errors 
+- 02c4423: fix: operation component props causing typescript errors
 
 ## 1.1.1
 
