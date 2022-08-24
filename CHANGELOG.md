@@ -1,5 +1,11 @@
 # @react-three/fiber
 
+## 1.1.2
+
+### Patch Changes
+
+- 02c4423: fix: operation component props causing typescript errors 
+
 ## 1.1.1
 
 ### Patch Changes
