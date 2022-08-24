@@ -12,7 +12,10 @@
     "prepublishOnly": "npm run build",
     "test": "echo no tests yet",
     "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook"
+    "build-storybook": "build-storybook",
+    "changeset:add": "changeset add",
+    "changeset:version": "yarn changeset version",
+    "changeset:release": "yarn build && yarn build-storybook && yarn changeset publish"
   },
   "husky": {
     "hooks": {
@@ -48,6 +51,8 @@
     "@babel/preset-env": "7.16.0",
     "@babel/preset-react": "7.16.0",
     "@babel/preset-typescript": "^7.16.0",
+    "@changesets/changelog-git": "^0.1.12",
+    "@changesets/cli": "^2.24.3",
     "@react-three/drei": "^9.22.4",
     "@react-three/fiber": "^8.2.0",
     "@rollup/plugin-babel": "^5.3.0",
