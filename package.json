@@ -98,6 +98,6 @@
   "homepage": "https://github.com/pmndrs/react-three-csg#readme",
   "dependencies": {
     "react-merge-refs": "^1.1.0",
-    "three-mesh-bvh": "^0.5.14"
+    "three-bvh-csg": "^0.0.2"
   }
 }
