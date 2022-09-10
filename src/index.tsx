@@ -12,9 +12,7 @@ import React, {
 import { ReactThreeFiber, extend, useFrame } from '@react-three/fiber'
 import mergeRefs from 'react-merge-refs'
 /** @ts-ignore */
-import * as CSG from './packages/three-bvh-csg'
-/** @ts-ignore */
-export * from './packages/three-bvh-csg'
+import * as CSG from 'three-bvh-csg'
 
 export type BrushRef = THREE.Mesh & {
   a: any
