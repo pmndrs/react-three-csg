@@ -1,5 +1,11 @@
 # @react-three/fiber
 
+## 1.1.4
+
+### Patch Changes
+
+- c9bca82: Remove three-bvh-csg source from codebase, use three-bvh-csg npm package
+
 ## 1.1.3
 
 ### Patch Changes
