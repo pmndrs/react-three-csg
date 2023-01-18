@@ -1,5 +1,11 @@
 # @react-three/fiber
 
+## 1.1.6
+
+### Patch Changes
+
+- update csg
+
 ## 1.1.4
 
 ### Patch Changes
