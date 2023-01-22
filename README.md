@@ -7,7 +7,7 @@
 yarn add @react-three/csg
 ```
 
-Constructive solid geometry for React, a small abstraction around https://github.com/gkjohnson/three-bvh-csg.
+Constructive solid geometry for React, a small abstraction around [gkjohnson/three-bvh-csg](https://github.com/gkjohnson/three-bvh-csg).
 
 Begin with a `CSG.Geometry` which is a regular `THREE.BufferGeometry` that you can pair with a `mesh`, or anything else that relies on geometry, for instance a physics `<RigidBody>`.
 
