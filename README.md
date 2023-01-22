@@ -42,12 +42,12 @@ function Shape() {
       <CSG.Geometry>
         {/** The chain begins with a base geometry, where all operations are carried out on. */}
         <CSG.Base geometry={bunnyGeometry} scale={1.5} position={[0, 0.5, 0]} />
-        {/** Now come the boolean operations: Addition, Subtraction, Difference and Intersection. */}
+        {/** Chain your boolean operations: Addition, Subtraction, Difference and Intersection. */}
         <CSG.Subtraction position={[-1, 1, 1]}>
-          {/** Geometry can be set by prop (see the root above), or by child, just like any regular <mesh>. */}
+          {/** Geometry can be set by prop or by child, just like any regular <mesh>. */}
           <sphereGeometry />
         </CSG.Subtraction>
-        {/** CSG.Geometry is re-usable, form your own hierachies with previously created CSG geometries. */}
+        {/** CSG.Geometry is re-usable, form hierachies with previously created CSG geometries. */}
         <CSG.Addition position={[0, 0, -0.75]}>
           {/** Combining two boxes into a cross */}
           <CSG.Geometry>
