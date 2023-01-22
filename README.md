@@ -27,7 +27,7 @@ You must first give it a `CSG.Base` which is the geometry foundation for all ens
         </CSG.Base>
 ```
 
-Now you chain your operations, as many as you like, but keep in mind that the order of operations matters. The following operations are available:
+Now you chain your operations, as many as you like, but keep in mind that order matters. The following operations are available:
 
 - `CSG.Subtraction` subtracts the geometry from the previous
 - `CSG.Addition` adds the geometry to the previous
