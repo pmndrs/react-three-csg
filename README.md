@@ -1,88 +1,131 @@
 <p>
-  <a href="https://codesandbox.io/s/eckvc1"><img width="20%" src="https://codesandbox.io/api/v1/sandboxes/eckvc1/screenshot.png" alt="Runtime"/></a>
-  <a href="https://codesandbox.io/s/mw0dtc"><img width="20%" src="https://codesandbox.io/api/v1/sandboxes/mw0dtc/screenshot.png" alt="Physics"/></a>
-  <a href="https://codesandbox.io/s/k3ly88"><img width="20%" src="https://codesandbox.io/api/v1/sandboxes/k3ly88/screenshot.png" alt="Instances"/></a>
-  <a href="https://codesandbox.io/s/tewiso"><img width="20%" src="https://codesandbox.io/api/v1/sandboxes/tewiso/screenshot.png" alt="Instances"/></a>
+  <a href="https://codesandbox.io/s/mlgzsc"><img width="20%" src="https://codesandbox.io/api/v1/sandboxes/mlgzsc/screenshot.png" alt="Demo"/></a>
+  <a href="https://codesandbox.io/s/y52tmt"><img width="20%" src="https://codesandbox.io/api/v1/sandboxes/y52tmt/screenshot.png" alt="Demo"/></a>
 </p>
 
 ```shell
 yarn add @react-three/csg
 ```
 
-A small, abstraction around https://github.com/gkjohnson/three-bvh-csg. It is not feature complete!
+A small, abstraction around https://github.com/gkjohnson/three-bvh-csg.
 
-You have 4 operations:
-
-- Subtraction
-- Addition
-- Difference
-- Intersection
-
-Each needs to fill two slots with a `<Brush>`, which is like a THREE.Mesh and needs a geometry. A brush must be either slot `a` or `b` (first & second operand), which you need to define as a prop.
-
-If you nest operations, the operation itself becomes a brush and must also define its slot.
-
-The outmost operation will yield a buffergeometry, so you can use it in a mesh, an instancedMesh, or whatever needs a geometry to function.
+You begin with a `CSG.Geometry` which is a regular `THREE.BufferGeometry` that you can pair with a `mesh`. You must first give it a `CSG.Base` which defines the base geometry to be operated upon. And now you chain your operations (`Subtraction`, `Addition`, `Difference`, `Intersection`), as many as you like. The order of operations is imporant! Think of it like an equation: bunnyGeometry + sphereGeometry - boxGeometry ... = outputGeometry.
 
 ```jsx
-import { Brush, Subtraction, Addition, Difference, Intersection } from '@react-three/csg'
-
-function Model() {
+function Cross() {
   return (
     <mesh>
-      <Subtraction>
-        <Subtraction a>
-          <Brush a scale={1.5} position={[0, -1.04, 0]} geometry={nodes.bunny.geometry} />
-          <Brush b position={[0.5, -0.75, 1]}>
-            <sphereGeometry />
-          </Brush>
-        </Subtraction>
-        <Brush b position={[-1, 1, 1]}>
-          <sphereGeometry />
-        </Brush>
-      </Subtraction>
-      <meshNormalMaterial />
+      <meshStandardMaterial />
+      <CSG.Geometry>
+        <CSG.Base scale={[2, 0.5, 0.5]} >
+          <boxGeometry />
+        </CSG.Base>
+        <CSG.Addition scale={[0.5, 2, 0.5]}>
+          <boxGeometry />
+        </CSG.Addition>
+      <CSG.Geometry>
     </mesh>
   )
 }
 ```
 
-#### Updating the operations
-
-If you update a brush, or an operation, set `needsUpdate` on it, it will bubble up to its base operation. Keep in mind that although the base CSG implementation is fast, this is something you may want to avoid doing often or runtime, depending on the complexity of your geometry.
+#### A more complex example
 
 ```jsx
+import * as CSG from '@react-three/csg'
+
 function Shape() {
-  const brush = useRef()
-  useFrame((state, delta) => {
-    brush.current.rotation.x += 0.025
-    brush.current.needsUpdate = true
-  })
   return (
     <mesh>
-      <Subtraction castShadow receiveShadow>
-        <Brush a rotation={[0, Math.PI / 2, 0]} position={[-0.35, 0.4, 0.4]}>
-          <boxGeometry />
-        </Brush>
-        <Brush b ref={brush} position={[-0.35, 0.4, 0.4]}>
-          <boxGeometry />
-        </Brush>
+      <meshNormalMaterial />
+      {/** This will yield a regular THREE.BufferGeometry which needs to be paired with a mesh. */}
+      <CSG.Geometry>
+        {/** The chain begins with a base geometry, where all operations are carried out on. */}
+        <CSG.Base geometry={bunnyGeometry} scale={1.5} position={[0, 0.5, 0]} />
+        {/** Now come the boolean operations: Addition, Subtraction, Difference and Intersection. */}
+        <CSG.Subtraction position={[-1, 1, 1]}>
+          {/** Geometry can be set by prop (see the root above), or by child, just like any regular <mesh>. */}
+          <sphereGeometry />
+        </CSG.Subtraction>
+        {/** CSG.Geometry is re-usable, form your own hierachies with previously created CSG geometries. */}
+        <CSG.Addition position={[0, 0, -0.75]}>
+          {/** Combining two boxes into a cross */}
+          <CSG.Geometry>
+            <CSG.Base geometry={boxGeometry} scale={[2, 0.5, 0.5]} />
+            <CSG.Addition geometry={boxGeometry} scale={[0.5, 2, 0.5]} />
+          </CSG.Geometry>
+        </CSG.Addition>
+        {/** You can deeply nest operations. */}
+        <group position={[0.5, 1, 0.9]}>
+          <CSG.Subtraction>
+            <sphereGeometry args={[0.65, 32, 32]} />
+          </CSG.Subtraction>
+        </group>
+      </CSG.Geometry>
+    </mesh>
+  )
+}
+```
+
+#### Updating the operations and runtime usage
+
+Call `update()` on the main geometry to re-create it. Keep in mind that although the base CSG implementation is fast, this is something you may want to avoid doing often or runtime, depending on the complexity of your geometry.
+
+The following would allow the user to move a cutter around with the mouse.
+
+```jsx
+import { PivotControls } from '@react-three/drei'
+
+function Shape() {
+  const csg = useRef()
+  return (
+    <mesh>
+      <CSG.Geometry ref={csg}>
+        <CSG.Base geometry={bunnyGeometry} />
+        <PivotControls depthTest={false} anchor={[0, 0, 0]} onDrag={() => csg.current.update()}>
+          <CSG.Subtraction geometry={sphereGeometry} />
+        </PivotControls>
 ```
 
 #### Using multi-material groups
 
-With the `useGroups` prop you can instruct CSG to generate material groups. Thereby instead of ending up with a single clump of geometry you can, for instance, make cuts with different materials. Each brush now takes its own material! The resulting material group will be inserted into the mesh that carries the output operation.
+With the `useGroups` prop you can instruct CSG to generate material groups. Thereby instead of ending up with a single clump of uniformly textured geometry you can, for instance, make cuts with different materials. Each operation now takes its own material! The resulting material group will be inserted into the mesh that carries the output operation.
 
 ```jsx
-<mesh>
-  <Subtraction useGroups>
-    <Brush a scale={1.5} position={[0, -1.04, 0]} geometry={nodes.bunny.geometry}>
-      <meshNormalMaterial />
-    </Brush>
-    <Brush b position={[-1, 1, 1]}>
-      <boxGeometry args={[1, 1, 1]} />
-      <meshStandardMaterial color="orange" />
-    </Brush>
-  </Subtraction>
-</mesh>
+function Shape() {
+  return (
+    <mesh>
+      <CSG.Geometry useGroups>
+        <CSG.Base geometry={bunnyGeometry}>
+          {/** The base material. Again it can be defined by prop or by child. */}
+          <meshStandardMaterial />
+        </CSG.Base>
+        <CSG.Subtraction position={[-1, 1, 1]} material={metal}>
+          {/** This cut-out will be blue. */ }
+          <meshStandardMaterial color="blue" />
+        </CSG.Subtraction>
+        {/** etc. */}
+        <CSG.Addition position={[1, -1, -1]} geometry={sphereGeometry} material={stone}>
+```
+
+#### Showing the operations
+
+The following will make all operations visible.
+
+```jsx
+function Shape() {
+  return (
+    <mesh>
+      <CSG.Geometry showOperations>
+```
+
+Whereas if you want to show only a single operation, you can do so by setting the `showOperation` prop on the root.
+
+```jsx
+function Shape() {
+  return (
+    <mesh>
+      <CSG.Geometry>
+        <CSG.Base geometry={bunnyGeometry} />
+        <CSG.Addition geometry={carrotGeometry} showOperation />
 ```

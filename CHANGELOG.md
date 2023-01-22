@@ -1,5 +1,11 @@
 # @react-three/fiber
 
+## 1.1.7
+
+### Patch Changes
+
+- fix types
+
 ## 1.1.6
 
 ### Patch Changes

@@ -1,211 +1,148 @@
+import * as React from 'react'
 import * as THREE from 'three'
-import React, {
-  createContext,
-  forwardRef,
-  useMemo,
-  useContext,
-  useLayoutEffect,
-  useEffect,
-  useRef,
-  useState,
-  useImperativeHandle,
-} from 'react'
-import { ReactThreeFiber, extend, useFrame } from '@react-three/fiber'
-import * as CSG from 'three-bvh-csg'
+import { extend, ReactThreeFiber } from '@react-three/fiber'
+import { SUBTRACTION, ADDITION, DIFFERENCE, INTERSECTION, Brush as BrushImpl, Evaluator } from 'three-bvh-csg'
 
-export type BrushProps = JSX.IntrinsicElements['mesh'] & {
-  a?: boolean
-  b?: boolean
+const TYPES = {
+  subtraction: SUBTRACTION,
+  addition: ADDITION,
+  difference: DIFFERENCE,
+  intersection: INTERSECTION,
 }
 
-type SharedOperationProps = JSX.IntrinsicElements['mesh'] & {
-  a?: boolean
-  b?: boolean
-  useGroups?: boolean
-}
-
-type OperationProps = SharedOperationProps & {
-  op: number
-}
-
-type Api = {
-  parent: Api
-  slots: [CSG.Brush | null, CSG.Brush | null]
-  update: (force?: boolean) => void
+export type Brush = BrushImpl & {
+  operator: keyof typeof TYPES
+  showOperation?: boolean
 }
 
 declare global {
   namespace JSX {
     interface IntrinsicElements {
-      brush: ReactThreeFiber.Object3DNode<THREE.Mesh, typeof CSG.Brush>
+      brush: ReactThreeFiber.Object3DNode<Brush, typeof THREE.Mesh>
     }
   }
 }
 
-const context = createContext<Api>(null!)
+export type CSGGeometryProps = {
+  children?: React.ReactNode
+  useGroups?: boolean
+  showOperations?: boolean
+}
 
-export const Brush = forwardRef(({ a, b, children, ...props }: BrushProps, fref: React.ForwardedRef<CSG.Brush>) => {
-  extend({ Brush: CSG.Brush })
+export type CSGGeometryApi = {
+  showOperations: boolean
+  useGroups: boolean
+  update: () => void
+}
 
-  const refBrush = useRef<CSG.Brush>(null!)
-  const parent = useContext(context)
+export type CSGGeometryRef = CSGGeometryApi & {
+  geometry: THREE.BufferGeometry
+  operations: THREE.Group
+}
 
-  useLayoutEffect(() => {
-    // If this brush does not have geometry directly traverse it
-    if (!refBrush.current.geometry || !refBrush.current.geometry.attributes?.position) {
-      let brush: THREE.Mesh = null!
-      refBrush.current.traverse(
-        (obj) => obj !== refBrush.current && obj instanceof CSG.Brush && (brush = obj as THREE.Mesh)
-      )
-      if (brush) refBrush.current.geometry = brush.geometry
-    }
+function dispose(geometry: THREE.BufferGeometry) {
+  geometry.dispose()
+  geometry.attributes = {}
+  geometry.groups = []
+  geometry.boundingBox = null
+  geometry.boundingSphere = null
+  geometry.drawRange = { start: 0, count: Infinity }
+}
 
-    // Subscribe to the operation above
-    if (parent && (a || b)) {
-      parent.slots[a ? 0 : 1] = refBrush.current
-    }
-  }, [])
-
-  const mounted = useRef(false)
-  useEffect(() => {
-    if (mounted.current && parent) parent.update(true)
-  })
-  useEffect(() => {
-    mounted.current = true
-  }, [])
-
-  useFrame(() => {
-    if (parent && (refBrush.current as any).needsUpdate) {
-      ;(refBrush.current as any).needsUpdate = false
-      parent.update(true)
-    }
-  })
-
-  useImperativeHandle(fref, () => refBrush.current, [])
-
-  return (
-    <brush ref={refBrush} geometry={undefined} {...props}>
-      {children}
-    </brush>
-  )
-})
-
-const Operation = forwardRef(
-  ({ a, b, children, op, useGroups = false, ...props }: OperationProps, fref: React.ForwardedRef<CSG.Brush>) => {
-    extend({ Brush: CSG.Brush })
-
-    const parent = useContext(context)
-    const refBrush = useRef<CSG.Brush>(null!)
-    const refGeom = useRef<THREE.BufferGeometry>(null!)
-    const [target] = useState<CSG.Brush>(() => new CSG.Brush())
-    const [csgEvaluator] = useState(() => new CSG.Evaluator())
-    const [slots] = useState<[CSG.Brush | null, CSG.Brush | null]>([null, null])
-
-    const api = useMemo(
-      () => ({
-        parent,
-        slots,
-        update: (force?: boolean) => {
-          const nodeA = slots[0]
-          const nodeB = slots[1]
-          if (nodeA && nodeB && refBrush.current) {
-            refBrush.current.matrixWorld.identity()
-            nodeA.updateMatrixWorld()
-            nodeB.updateMatrixWorld()
-            csgEvaluator.useGroups = useGroups
-
-            function dispose(geometry: THREE.BufferGeometry) {
-              geometry.attributes = {}
-              geometry.groups = []
-              geometry.boundingBox = null
-              geometry.boundingSphere = null
-              geometry.drawRange = { start: 0, count: Infinity }
-              geometry.dispose()
-            }
-
-            try {
-              if (target.geometry) {
-                // Dispose previous geometry
-                dispose(target.geometry)
-                if (!parent) dispose(refGeom.current)
-                target.geometry = new THREE.BufferGeometry()
-              }
-
-              const result = csgEvaluator.evaluate(nodeA, nodeB, op, target)
-              const geometry = result.geometry
-
-              if (parent) {
-                refBrush.current.geometry = geometry
-                if (csgEvaluator.useGroups) refBrush.current.material = result.material
-              } else {
-                // Overwrite the higher up meshs material to use material groups
-                if (csgEvaluator.useGroups && (refGeom.current as any)?.__r3f?.parent)
-                  (refGeom.current as any).__r3f.parent.material = result.material
-                refGeom.current.attributes = geometry.attributes
-                refGeom.current.groups = geometry.groups
-                refGeom.current.drawRange = geometry.drawRange
-              }
-            } catch (e) {
-              console.log(e)
-            }
-            if (force) {
-              let cur = parent
-              while (cur) {
-                cur.update()
-                cur = cur.parent
-              }
-            }
-          }
-        },
-      }),
-      [parent, useGroups]
-    )
-
-    useLayoutEffect(() => {
-      // If an operation above this one exists, make this one act as a brush and subscribe to the op
-      if (parent && (a || b)) {
-        parent.slots[a ? 0 : 1] = refBrush.current
-      }
-      api.update(true)
-    }, [api])
-
-    useFrame(() => {
-      if ((refBrush.current as any).needsUpdate) {
-        ;(refBrush.current as any).needsUpdate = false
-        api.update(true)
-      }
+function resolve(op: THREE.Object3D): Brush {
+  let currentOp: THREE.Object3D = null!
+  if (op instanceof BrushImpl) {
+    op.updateMatrixWorld()
+    currentOp = op
+  } else {
+    op.traverse((obj) => {
+      obj.updateMatrixWorld()
+      if (!currentOp && obj instanceof BrushImpl) currentOp = obj
     })
+  }
+  return currentOp as Brush
+}
 
-    useImperativeHandle(fref, () => refBrush.current, [])
+const csgContext = React.createContext<CSGGeometryApi>(null!)
+export const Geometry = React.forwardRef(
+  (
+    { children, useGroups = false, showOperations = false }: CSGGeometryProps,
+    fref: React.ForwardedRef<CSGGeometryRef>
+  ) => {
+    const geo = React.useRef<THREE.BufferGeometry>(null!)
+    const operations = React.useRef<THREE.Group>(null!)
+    const ev = React.useMemo(() => Object.assign(new Evaluator(), { useGroups }), [useGroups])
+
+    const update = React.useCallback(() => {
+      try {
+        const ops = operations.current.children.slice() as Brush[]
+        if (ops.length > 1) {
+          // Dispose old geometry
+          dispose(geo.current)
+          // Set the ops groups matrix to identiy
+          operations.current.matrixWorld.identity()
+
+          let root = resolve(ops.shift()!)
+          if (root) {
+            while (ops.length) {
+              const op = resolve(ops.shift()!)
+              if (op) root = ev.evaluate(root, op, TYPES[op.operator] || ADDITION) as Brush
+            }
+            geo.current.attributes = root.geometry.attributes
+            geo.current.groups = root.geometry.groups
+            geo.current.drawRange = root.geometry.drawRange
+            if (ev.useGroups && (geo.current as any)?.__r3f?.parent?.material)
+              (geo.current as any).__r3f.parent.material = root.material
+          }
+        }
+      } catch (e) {
+        console.log(e)
+      }
+    }, [ev])
+
+    const api = React.useMemo(() => ({ showOperations, useGroups, update }), [showOperations, useGroups])
+    React.useLayoutEffect(() => void update())
+    React.useImperativeHandle(fref, () => ({ geometry: geo.current, operations: operations.current, ...api }), [api])
 
     return (
-      <context.Provider value={api}>
-        <bufferGeometry ref={refGeom}>
-          <brush ref={refBrush} {...props}>
-            {children}
-          </brush>
-        </bufferGeometry>
-      </context.Provider>
+      <>
+        <group matrixAutoUpdate={false} ref={operations}>
+          <csgContext.Provider value={api}>{children}</csgContext.Provider>
+        </group>
+        <bufferGeometry ref={geo} />
+      </>
     )
   }
 )
 
-export type SubtractionProps = SharedOperationProps
-export const Subtraction = forwardRef((props: SubtractionProps, fref: React.ForwardedRef<CSG.Brush>) => (
-  <Operation {...props} ref={fref} op={CSG.SUBTRACTION} />
-))
+export const Base = React.forwardRef(
+  (
+    { showOperation, operator = 'addition', ...props }: JSX.IntrinsicElements['brush'],
+    fref: React.ForwardedRef<Brush>
+  ) => {
+    extend({ Brush: BrushImpl })
+    const { showOperations } = React.useContext(csgContext)
+    return (
+      <brush
+        operator={operator}
+        raycast={() => null}
+        visible={showOperation || showOperations ? true : false}
+        ref={fref}
+        {...props}
+      />
+    )
+  }
+)
 
-export type AdditionProps = SharedOperationProps
-export const Addition = forwardRef((props: AdditionProps, fref: React.ForwardedRef<CSG.Brush>) => (
-  <Operation {...props} ref={fref} op={CSG.ADDITION} />
+export const Addition = React.forwardRef((props, fref: React.ForwardedRef<Brush>) => (
+  <Base ref={fref} operator="addition" {...props} />
 ))
-
-export type DifferenceProps = SharedOperationProps
-export const Difference = forwardRef((props: DifferenceProps, fref: React.ForwardedRef<CSG.Brush>) => (
-  <Operation {...props} ref={fref} op={CSG.DIFFERENCE} />
+export const Subtraction = React.forwardRef((props, fref: React.ForwardedRef<Brush>) => (
+  <Base ref={fref} operator="subtraction" {...props} />
 ))
-
-export type IntersectionProps = SharedOperationProps
-export const Intersection = forwardRef((props: IntersectionProps, fref: React.ForwardedRef<CSG.Brush>) => (
-  <Operation {...props} ref={fref} op={CSG.INTERSECTION} />
+export const Difference = React.forwardRef((props, fref: React.ForwardedRef<Brush>) => (
+  <Base ref={fref} operator="difference" {...props} />
+))
+export const Intersection = React.forwardRef((props, fref: React.ForwardedRef<Brush>) => (
+  <Base ref={fref} operator="intersection" {...props} />
 ))

@@ -1,6 +1,6 @@
 {
   "name": "@react-three/csg",
-  "version": "1.1.6",
+  "version": "1.1.7",
   "description": "Constructive solid geometry for React",
   "main": "dist/index.cjs",
   "module": "dist/index.js",
@@ -97,6 +97,6 @@
   },
   "homepage": "https://github.com/pmndrs/react-three-csg#readme",
   "dependencies": {
-    "three-bvh-csg": "^0.0.3"
+    "three-bvh-csg": "^0.0.4"
   }
 }
