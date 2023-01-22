@@ -9,7 +9,16 @@ yarn add @react-three/csg
 
 A small, abstraction around https://github.com/gkjohnson/three-bvh-csg.
 
-You begin with a `CSG.Geometry` which is a regular `THREE.BufferGeometry` that you can pair with a `mesh`. You must first give it a `CSG.Base` which defines the base geometry to be operated upon. And now you chain your operations (`Subtraction`, `Addition`, `Difference`, `Intersection`), as many as you like. The order of operations is imporant! Think of it like an equation: bunnyGeometry + sphereGeometry - boxGeometry ... = outputGeometry.
+You begin with a `CSG.Geometry` which is a regular `THREE.BufferGeometry` that you can pair with a `mesh`, or anything else that relies on geometry, for instance a physics `<RigidBody>`.
+
+You must first give it a `CSG.Base` which is the foundation for all ensuing operations. 
+
+Now you chain your operations, as many as you like, but keep in mind that the order of operations matters. The following operations are available:
+
+- `CSG.Subtraction` subtracts the geometry from the previous
+- `CSG.Addition` adds the geometry to the previous
+- `CSG.Intersection` is the overlap between this geometry and the previous
+- `CSG.Difference` is the negative overlap between this geometry and the previous
 
 ```jsx
 function Cross() {
