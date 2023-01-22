@@ -93,6 +93,7 @@ export const Geometry = React.forwardRef(
             geo.current.drawRange = root.geometry.drawRange
             if (ev.useGroups && (geo.current as any)?.__r3f?.parent?.material)
               (geo.current as any).__r3f.parent.material = root.material
+            geo.current.computeVertexNormals()
           }
         }
       } catch (e) {
