@@ -19,7 +19,7 @@ function Cross() {
       <CSG.Geometry>
 ```
 
-You must first give it a `CSG.Base` which is the foundation for all ensuing operations. 
+You must first give it a `CSG.Base` which is the geometry foundation for all ensuing operations. All operations within `CSG.Geometry`, including `Base`. behave like regular meshes, they all receive geometry (and optionally a material, see #using-multi-material-groups), you can group and transform them.
 
 ```jsx
         <CSG.Base scale={[2, 0.5, 0.5]} >
