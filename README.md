@@ -35,9 +35,6 @@ Now you chain your operations, as many as you like, but keep in mind that order 
 - `CSG.Difference` is the negative overlap between the geometry and the previous
 
 ```jsx
-        <CSG.Base scale={[2, 0.5, 0.5]} >
-          <boxGeometry />
-        </CSG.Base>
         <CSG.Addition scale={[0.5, 2, 0.5]}>
           <boxGeometry />
         </CSG.Addition>
