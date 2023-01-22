@@ -24,9 +24,9 @@ function Cross() {
 You must first give it a `Base` which is the geometry foundation for all ensuing operations. All operations within `Geometry`, including `Base`. behave like regular meshes, they all receive geometry (and optionally a material, see [using-multi-material-groups](#using-multi-material-groups)), you can group and transform them.
 
 ```jsx
-<Base scale={[2, 0.5, 0.5]}>
-  <boxGeometry />
-</Base>
+        <Base scale={[2, 0.5, 0.5]}>
+          <boxGeometry />
+        </Base>
 ```
 
 Now you chain your operations, as many as you like, but keep in mind that order matters. The following operations are available:
