@@ -7,11 +7,25 @@
 yarn add @react-three/csg
 ```
 
-A small, abstraction around https://github.com/gkjohnson/three-bvh-csg.
+Constructive solid geometry for React, a small abstraction around https://github.com/gkjohnson/three-bvh-csg.
 
-You begin with a `CSG.Geometry` which is a regular `THREE.BufferGeometry` that you can pair with a `mesh`, or anything else that relies on geometry, for instance a physics `<RigidBody>`.
+Begin with a `CSG.Geometry` which is a regular `THREE.BufferGeometry` that you can pair with a `mesh`, or anything else that relies on geometry, for instance a physics `<RigidBody>`.
+
+```jsx
+function Cross() {
+  return (
+    <mesh>
+      <meshStandardMaterial />
+      <CSG.Geometry>
+```
 
 You must first give it a `CSG.Base` which is the foundation for all ensuing operations. 
+
+```jsx
+        <CSG.Base scale={[2, 0.5, 0.5]} >
+          <boxGeometry />
+        </CSG.Base>
+```
 
 Now you chain your operations, as many as you like, but keep in mind that the order of operations matters. The following operations are available:
 
@@ -21,11 +35,6 @@ Now you chain your operations, as many as you like, but keep in mind that the or
 - `CSG.Difference` is the negative overlap between the geometry and the previous
 
 ```jsx
-function Cross() {
-  return (
-    <mesh>
-      <meshStandardMaterial />
-      <CSG.Geometry>
         <CSG.Base scale={[2, 0.5, 0.5]} >
           <boxGeometry />
         </CSG.Base>
