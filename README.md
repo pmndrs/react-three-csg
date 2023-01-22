@@ -17,8 +17,8 @@ Now you chain your operations, as many as you like, but keep in mind that the or
 
 - `CSG.Subtraction` subtracts the geometry from the previous
 - `CSG.Addition` adds the geometry to the previous
-- `CSG.Intersection` is the overlap between this geometry and the previous
-- `CSG.Difference` is the negative overlap between this geometry and the previous
+- `CSG.Intersection` is the overlap between the geometry and the previous
+- `CSG.Difference` is the negative overlap between the geometry and the previous
 
 ```jsx
 function Cross() {
