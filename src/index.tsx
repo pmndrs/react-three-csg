@@ -104,7 +104,7 @@ export const Geometry = React.forwardRef(
       } catch (e) {
         console.log(e)
       }
-    }, [ev])
+    }, [computeVertexNormals, ev])
 
     const api = React.useMemo(
       () => ({ computeVertexNormals, showOperations, useGroups, update }),
