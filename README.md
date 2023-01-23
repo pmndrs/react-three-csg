@@ -86,7 +86,7 @@ function Shape() {
 
 #### Updating the operations and runtime usage
 
-Call `update()` on the main geometry to re-create it. Keep in mind that although the base CSG implementation is fast, this is something you may want to avoid doing often or runtime, depending on the complexity of your geometry.
+Call `update()` on the main geometry to re-create it. Keep in mind that although the base CSG implementation is fast, this is something you may want to avoid doing often or runtime, depending on the complexity of your geometry. By default it will compute vertex normals (to fix lighting issues), if you don't want that just call `update(false)`.
 
 The following would allow the user to move a cutter around with the mouse.
 

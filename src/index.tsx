@@ -32,7 +32,7 @@ export type CSGGeometryProps = {
 export type CSGGeometryApi = {
   showOperations: boolean
   useGroups: boolean
-  update: () => void
+  update: (computeVertexNormals?: boolean) => void
 }
 
 export type CSGGeometryRef = CSGGeometryApi & {
@@ -73,7 +73,7 @@ export const Geometry = React.forwardRef(
     const operations = React.useRef<THREE.Group>(null!)
     const ev = React.useMemo(() => Object.assign(new Evaluator(), { useGroups }), [useGroups])
 
-    const update = React.useCallback(() => {
+    const update = React.useCallback((computeVertexNormals = true) => {
       try {
         const ops = operations.current.children.slice() as Brush[]
         if (ops.length > 1) {
@@ -93,7 +93,7 @@ export const Geometry = React.forwardRef(
             geo.current.drawRange = root.geometry.drawRange
             if (ev.useGroups && (geo.current as any)?.__r3f?.parent?.material)
               (geo.current as any).__r3f.parent.material = root.material
-            geo.current.computeVertexNormals()
+            if (computeVertexNormals) geo.current.computeVertexNormals()
           }
         }
       } catch (e) {
