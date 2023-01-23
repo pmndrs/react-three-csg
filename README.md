@@ -89,7 +89,7 @@ function Shape() {
 
 #### Updating the operations and runtime usage
 
-Call `update()` on the main geometry to re-create it. Keep in mind that although the base CSG implementation is fast, this is something you may want to avoid doing often or runtime, depending on the complexity of your geometry. If you want it to re-compute vertex normals (for instance to fix lighting issues), call `update(true)`.
+Call `update()` on the main geometry to re-create it. Keep in mind that although the base CSG implementation is fast, this is something you may want to avoid doing often or runtime, depending on the complexity of your geometry.
 
 The following would allow the user to move a cutter around with the mouse.
 
@@ -148,4 +148,30 @@ function Shape() {
       <Geometry>
         <Base geometry={bunnyGeometry} />
         <Addition geometry={carrotGeometry} showOperation />
+```
+
+### API Types
+
+```tsx
+export type CSGGeometryProps = {
+  children?: React.ReactNode
+  /** Use material groups, each operation can have its own material, default: false */
+  useGroups?: boolean
+  /** Show operation meshes, default: false */
+  showOperations?: boolean
+  /** Re-compute vertx normals, default: false */
+  computeVertexNormals?: boolean
+}
+
+export type CSGGeometryApi = {
+  computeVertexNormals: boolean
+  showOperations: boolean
+  useGroups: boolean
+  update: () => void
+}
+
+export type CSGGeometryRef = CSGGeometryApi & {
+  geometry: THREE.BufferGeometry
+  operations: THREE.Group
+}
 ```

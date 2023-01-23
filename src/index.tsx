@@ -25,14 +25,19 @@ declare global {
 
 export type CSGGeometryProps = {
   children?: React.ReactNode
+  /** Use material groups, each operation can have its own material, default: false */
   useGroups?: boolean
+  /** Show operation meshes, default: false */
   showOperations?: boolean
+  /** Re-compute vertx normals, default: false */
+  computeVertexNormals?: boolean
 }
 
 export type CSGGeometryApi = {
+  computeVertexNormals: boolean
   showOperations: boolean
   useGroups: boolean
-  update: (computeVertexNormals?: boolean) => void
+  update: () => void
 }
 
 export type CSGGeometryRef = CSGGeometryApi & {
@@ -66,14 +71,14 @@ function resolve(op: THREE.Object3D): Brush {
 const csgContext = React.createContext<CSGGeometryApi>(null!)
 export const Geometry = React.forwardRef(
   (
-    { children, useGroups = false, showOperations = false }: CSGGeometryProps,
+    { children, computeVertexNormals = false, useGroups = false, showOperations = false }: CSGGeometryProps,
     fref: React.ForwardedRef<CSGGeometryRef>
   ) => {
     const geo = React.useRef<THREE.BufferGeometry>(null!)
     const operations = React.useRef<THREE.Group>(null!)
     const ev = React.useMemo(() => Object.assign(new Evaluator(), { useGroups }), [useGroups])
 
-    const update = React.useCallback((computeVertexNormals = false) => {
+    const update = React.useCallback(() => {
       try {
         const ops = operations.current.children.slice() as Brush[]
         if (ops.length > 1) {
@@ -101,7 +106,10 @@ export const Geometry = React.forwardRef(
       }
     }, [ev])
 
-    const api = React.useMemo(() => ({ showOperations, useGroups, update }), [showOperations, useGroups])
+    const api = React.useMemo(
+      () => ({ computeVertexNormals, showOperations, useGroups, update }),
+      [computeVertexNormals, showOperations, useGroups]
+    )
     React.useLayoutEffect(() => void update())
     React.useImperativeHandle(fref, () => ({ geometry: geo.current, operations: operations.current, ...api }), [api])
 
@@ -118,19 +126,13 @@ export const Geometry = React.forwardRef(
 
 export const Base = React.forwardRef(
   (
-    { showOperation, operator = 'addition', ...props }: JSX.IntrinsicElements['brush'],
+    { showOperation = false, operator = 'addition', ...props }: JSX.IntrinsicElements['brush'],
     fref: React.ForwardedRef<Brush>
   ) => {
     extend({ Brush: BrushImpl })
     const { showOperations } = React.useContext(csgContext)
     return (
-      <brush
-        operator={operator}
-        raycast={() => null}
-        visible={showOperation || showOperations ? true : false}
-        ref={fref}
-        {...props}
-      />
+      <brush operator={operator} raycast={() => null} visible={showOperation || showOperations} ref={fref} {...props} />
     )
   }
 )
