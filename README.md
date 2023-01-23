@@ -9,7 +9,7 @@ yarn add @react-three/csg
 
 Constructive solid geometry for React, a small abstraction around [gkjohnson/three-bvh-csg](https://github.com/gkjohnson/three-bvh-csg).
 
-Begin with a `Geometry` which is a regular `THREE.BufferGeometry` that you can pair with a `mesh`, or anything else that relies on geometry, for instance a physics `<RigidBody>`.
+Begin with a `Geometry` which is a regular `THREE.BufferGeometry` that you can pair with a `mesh`, or anything else that relies on geometry (physics rigid bodies etc).
 
 ```jsx
 import { Geometry, Base, Addition, Subtraction, Intersection, Difference } from '@react-three/csg'
@@ -21,7 +21,7 @@ function Cross() {
       <Geometry>
 ```
 
-You must first give it a `Base` which is the geometry foundation for all ensuing operations. All operations within `Geometry`, including `Base`. behave like regular meshes, they all receive geometry (and optionally a material, see [using-multi-material-groups](#using-multi-material-groups)), you can group and transform them.
+You must first give it a `Base` which is the geometry foundation for all ensuing operations. All operations within `Geometry`, including `Base`, behave like regular meshes. They all receive geometry (and optionally a material, see [using-multi-material-groups](#using-multi-material-groups)), you can also nest, group and transform them.
 
 ```jsx
         <Base scale={[2, 0.5, 0.5]}>
