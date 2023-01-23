@@ -1,9 +1,9 @@
-<p>
-  <a href="https://codesandbox.io/s/mlgzsc"><img width="20%" src="https://codesandbox.io/api/v1/sandboxes/mlgzsc/screenshot.png" alt="Demo"/></a>
-  <a href="https://codesandbox.io/s/y52tmt"><img width="20%" src="https://codesandbox.io/api/v1/sandboxes/y52tmt/screenshot.png" alt="Interactive"/></a>
-  <a href="https://codesandbox.io/s/mw0dtc"><img width="20%" src="https://codesandbox.io/api/v1/sandboxes/mw0dtc/screenshot.png" alt="Physics"/></a>
-  <a href="https://codesandbox.io/s/k3ly88"><img width="20%" src="https://codesandbox.io/api/v1/sandboxes/k3ly88/screenshot.png" alt="Instances"/></a>
-  <a href="https://codesandbox.io/s/k4qfiz"><img width="20%" src="https://codesandbox.io/api/v1/sandboxes/k4qfiz/screenshot.png" alt="Slicing"/></a>
+<p align="center">
+  <a href="https://codesandbox.io/s/mlgzsc"><img width="19%" src="https://codesandbox.io/api/v1/sandboxes/mlgzsc/screenshot.png" alt="Demo"/></a>
+  <a href="https://codesandbox.io/s/y52tmt"><img width="19%" src="https://codesandbox.io/api/v1/sandboxes/y52tmt/screenshot.png" alt="Interactive"/></a>
+  <a href="https://codesandbox.io/s/mw0dtc"><img width="19%" src="https://codesandbox.io/api/v1/sandboxes/mw0dtc/screenshot.png" alt="Physics"/></a>
+  <a href="https://codesandbox.io/s/k3ly88"><img width="19%" src="https://codesandbox.io/api/v1/sandboxes/k3ly88/screenshot.png" alt="Instances"/></a>
+  <a href="https://codesandbox.io/s/k4qfiz"><img width="19%" src="https://codesandbox.io/api/v1/sandboxes/k4qfiz/screenshot.png" alt="Slicing"/></a>
 </p>
 
 ```shell
