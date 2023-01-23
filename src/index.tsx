@@ -73,7 +73,7 @@ export const Geometry = React.forwardRef(
     const operations = React.useRef<THREE.Group>(null!)
     const ev = React.useMemo(() => Object.assign(new Evaluator(), { useGroups }), [useGroups])
 
-    const update = React.useCallback((computeVertexNormals = true) => {
+    const update = React.useCallback((computeVertexNormals = false) => {
       try {
         const ops = operations.current.children.slice() as Brush[]
         if (ops.length > 1) {
