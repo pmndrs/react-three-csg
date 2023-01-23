@@ -49,8 +49,7 @@ function dispose(geometry: THREE.BufferGeometry) {
   geometry.dispose()
   geometry.attributes = {}
   geometry.groups = []
-  geometry.boundingBox = null
-  geometry.boundingSphere = null
+  geometry.index = geometry.boundingBox = geometry.boundingSphere = null
   geometry.drawRange = { start: 0, count: Infinity }
 }
 
@@ -81,7 +80,7 @@ export const Geometry = React.forwardRef(
     const update = React.useCallback(() => {
       try {
         const ops = operations.current.children.slice() as Brush[]
-        if (ops.length > 1) {
+        if (ops.length > 0) {
           // Dispose old geometry
           dispose(geo.current)
           // Set the ops groups matrix to identiy
@@ -93,6 +92,7 @@ export const Geometry = React.forwardRef(
               const op = resolve(ops.shift()!)
               if (op) root = ev.evaluate(root, op, TYPES[op.operator] || ADDITION) as Brush
             }
+            geo.current.index = root.geometry.index
             geo.current.attributes = root.geometry.attributes
             geo.current.groups = root.geometry.groups
             geo.current.drawRange = root.geometry.drawRange
