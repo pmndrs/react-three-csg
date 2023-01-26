@@ -49,7 +49,7 @@ function dispose(geometry: THREE.BufferGeometry) {
   geometry.dispose()
   geometry.attributes = {}
   geometry.groups = []
-  geometry.index = geometry.boundingBox = geometry.boundingSphere = null
+  ;(geometry as any).boundsTree = geometry.index = geometry.boundingBox = geometry.boundingSphere = null
   geometry.drawRange = { start: 0, count: Infinity }
 }
 
@@ -92,6 +92,7 @@ export const Geometry = React.forwardRef(
               const op = resolve(ops.shift()!)
               if (op) root = ev.evaluate(root, op, TYPES[op.operator] || ADDITION) as Brush
             }
+            ;(geo.current as any).boundsTree = (root.geometry as any).boundsTree
             geo.current.index = root.geometry.index
             geo.current.attributes = root.geometry.attributes
             geo.current.groups = root.geometry.groups
