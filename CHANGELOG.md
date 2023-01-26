@@ -1,5 +1,55 @@
 # @react-three/fiber
 
+## 2.0.6
+
+### Patch Changes
+
+- fix: hot reload issues
+
+## 2.0.5
+
+### Patch Changes
+
+- feat: show base without ops, support index
+
+## 2.0.4
+
+### Patch Changes
+
+- readme updates
+- fix: compute vertex normals
+- fix: deps
+
+## 2.0.3
+
+### Patch Changes
+
+- readme updates
+- fix: compute vertex normals false by default
+
+## 2.0.2
+
+### Patch Changes
+
+- readme updates
+- feat: make recomputing vertex normals optional
+
+## 2.0.1
+
+### Patch Changes
+
+- fix: recompute vertex normals
+
+## 2.0.0
+
+## Major Changes
+
+- react-three/csg 2.x has been released!
+  - 🎉 simple api to capture constructive solid geometry
+  - 💫 chaining as many ops as you like
+  - 👨‍👧‍👦 hierarchies, nesting, grouping, re-use
+  - 🙌 interop with other eco system components
+
 ## 1.1.7
 
 ### Patch Changes
