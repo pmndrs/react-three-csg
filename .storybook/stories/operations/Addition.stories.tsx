@@ -1,5 +1,5 @@
 import React from 'react'
-import { Addition, Brush } from '../../../src'
+import { Addition, Base, Geometry } from '../../../src'
 import { Setup } from '../../common'
 
 export default {
@@ -9,14 +9,14 @@ export default {
 export const Basic = () => (
   <Setup>
     <mesh>
-      <Addition>
-        <Brush a position-z={0.5}>
+      <Geometry>
+        <Base position-z={0.5}>
           <boxBufferGeometry args={[1, 1, 1]} />
-        </Brush>
-        <Brush b position-z={-0.5}>
+        </Base>
+        <Addition position-z={-0.5}>
           <sphereBufferGeometry args={[1, 64, 64]} />
-        </Brush>
-      </Addition>
+        </Addition>
+      </Geometry>
       <meshNormalMaterial />
     </mesh>
   </Setup>

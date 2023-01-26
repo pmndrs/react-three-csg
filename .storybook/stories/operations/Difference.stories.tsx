@@ -1,5 +1,5 @@
 import React from 'react'
-import { Brush, Difference } from '../../../src'
+import { Base, Difference, Geometry } from '../../../src'
 import { BoxBlendGeometry, Setup } from '../../common'
 
 export default {
@@ -10,14 +10,14 @@ export const Basic = () => (
   <Setup camera={{ position: [1, 1, 3] }}>
     <group position={[0, 0, 0]}>
       <mesh>
-        <Difference>
-          <Brush a position={[-0.3, -0.3, 0.4]}>
+        <Geometry>
+          <Base position={[-0.3, -0.3, 0.4]}>
             <BoxBlendGeometry depth={0.5} />
-          </Brush>
-          <Brush b position={[0.3, 0.3, 0.4]}>
+          </Base>
+          <Difference position={[0.3, 0.3, 0.4]}>
             <BoxBlendGeometry depth={0.8} />
-          </Brush>
-        </Difference>
+          </Difference>
+        </Geometry>
         <meshNormalMaterial opacity={0.6} transparent />
       </mesh>
     </group>

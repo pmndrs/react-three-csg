@@ -1,5 +1,5 @@
 import React from 'react'
-import { Brush, Intersection } from '../../../src'
+import { Base, Geometry, Intersection } from '../../../src'
 import { BoxBlendGeometry, Setup } from '../../common'
 
 export default {
@@ -10,14 +10,14 @@ export const Basic = () => (
   <Setup camera={{ position: [1, 1, 3] }}>
     <group position={[0, 0, 0]}>
       <mesh>
-        <Intersection>
-          <Brush a position={[-0.3, -0.3, 0.4]}>
+        <Geometry>
+          <Base position={[-0.3, -0.3, 0.4]}>
             <BoxBlendGeometry />
-          </Brush>
-          <Brush b position={[0.3, 0.3, 0.4]}>
+          </Base>
+          <Intersection position={[0.3, 0.3, 0.4]}>
             <BoxBlendGeometry />
-          </Brush>
-        </Intersection>
+          </Intersection>
+        </Geometry>
         <meshNormalMaterial />
       </mesh>
 
