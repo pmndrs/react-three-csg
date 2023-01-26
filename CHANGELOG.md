@@ -1,5 +1,11 @@
 # @react-three/fiber
 
+## 2.0.7
+
+### Patch Changes
+
+- bcbae0a: feat: export props and ref types for base and operation components
+
 ## 2.0.6
 
 ### Patch Changes
