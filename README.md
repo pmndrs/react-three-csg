@@ -107,6 +107,27 @@ function Shape() {
         </PivotControls>
 ```
 
+#### Using the context API
+
+The `useCSG` hook exposes the `update` function, which can be used to update the geometry. This is useful when you want to update the geometry from a child component.
+
+```jsx
+const Shape = () => (
+  <mesh>
+    <Geometry>
+      <Base geometry={bunnyGeometry} />
+      <Cutter />
+
+function Cutter() {
+  const { update } = useCSG()
+  return (
+    <PivotControls onDrag={update}>
+      <Subtraction>
+        <boxGeometry />
+      </Subtraction>
+    </PivotControls>
+```
+
 #### Using multi-material groups
 
 With the `useGroups` prop you can instruct CSG to generate material groups. Thereby instead of ending up with a single clump of uniformly textured geometry you can, for instance, make cuts with different materials. Each operation now takes its own material! The resulting material group will be inserted into the mesh that carries the output operation.

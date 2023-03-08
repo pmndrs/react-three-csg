@@ -141,12 +141,19 @@ export const Base = React.forwardRef(
 export const Addition = React.forwardRef((props, fref: React.ForwardedRef<Brush>) => (
   <Base ref={fref} operator="addition" {...props} />
 ))
+
 export const Subtraction = React.forwardRef((props, fref: React.ForwardedRef<Brush>) => (
   <Base ref={fref} operator="subtraction" {...props} />
 ))
+
 export const Difference = React.forwardRef((props, fref: React.ForwardedRef<Brush>) => (
   <Base ref={fref} operator="difference" {...props} />
 ))
+
 export const Intersection = React.forwardRef((props, fref: React.ForwardedRef<Brush>) => (
   <Base ref={fref} operator="intersection" {...props} />
 ))
+
+export function useCSG() {
+  return React.useContext(csgContext)
+}
