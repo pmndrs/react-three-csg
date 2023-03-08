@@ -68,11 +68,9 @@ function resolve(op: THREE.Object3D): Brush {
 }
 
 const csgContext = React.createContext<CSGGeometryApi>(null!)
-export const Geometry = React.forwardRef(
-  (
-    { children, computeVertexNormals = false, useGroups = false, showOperations = false }: CSGGeometryProps,
-    fref: React.ForwardedRef<CSGGeometryRef>
-  ) => {
+
+export const Geometry = React.forwardRef<CSGGeometryRef, CSGGeometryProps>(
+  ({ children, computeVertexNormals = false, useGroups = false, showOperations = false }, fref) => {
     const geo = React.useRef<THREE.BufferGeometry>(null!)
     const operations = React.useRef<THREE.Group>(null!)
     const ev = React.useMemo(() => Object.assign(new Evaluator(), { useGroups }), [useGroups])
@@ -125,11 +123,10 @@ export const Geometry = React.forwardRef(
   }
 )
 
-export const Base = React.forwardRef(
-  (
-    { showOperation = false, operator = 'addition', ...props }: JSX.IntrinsicElements['brush'],
-    fref: React.ForwardedRef<Brush>
-  ) => {
+export type BaseProps = JSX.IntrinsicElements['brush']
+export type BaseRef = Brush
+export const Base = React.forwardRef<Brush, BaseProps>(
+  ({ showOperation = false, operator = 'addition', ...props }, fref) => {
     extend({ Brush: BrushImpl })
     const { showOperations } = React.useContext(csgContext)
     return (
@@ -138,19 +135,29 @@ export const Base = React.forwardRef(
   }
 )
 
-export const Addition = React.forwardRef((props, fref: React.ForwardedRef<Brush>) => (
+type OperationProps = Omit<BaseProps, 'operator'>
+
+export type AdditionProps = OperationProps
+export type AdditionRef = BaseRef
+export const Addition = React.forwardRef<AdditionRef, OperationProps>((props, fref) => (
   <Base ref={fref} operator="addition" {...props} />
 ))
 
-export const Subtraction = React.forwardRef((props, fref: React.ForwardedRef<Brush>) => (
+export type SubtractionProps = OperationProps
+export type SubtractionRef = BaseRef
+export const Subtraction = React.forwardRef<SubtractionRef, OperationProps>((props, fref) => (
   <Base ref={fref} operator="subtraction" {...props} />
 ))
 
-export const Difference = React.forwardRef((props, fref: React.ForwardedRef<Brush>) => (
+export type DifferenceProps = OperationProps
+export type DifferenceRef = BaseRef
+export const Difference = React.forwardRef<DifferenceRef, OperationProps>((props, fref) => (
   <Base ref={fref} operator="difference" {...props} />
 ))
 
-export const Intersection = React.forwardRef((props, fref: React.ForwardedRef<Brush>) => (
+export type IntersectionProps = OperationProps
+export type IntersectionRef = BaseRef
+export const Intersection = React.forwardRef<IntersectionRef, OperationProps>((props, fref) => (
   <Base ref={fref} operator="intersection" {...props} />
 ))
 

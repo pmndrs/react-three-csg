@@ -14,7 +14,7 @@
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook",
     "changeset:add": "changeset add",
-    "changeset:version": "yarn changeset version",
+    "changeset:version": "yarn changeset version && yarn install --mode update-lockfile",
     "changeset:release": "yarn build && yarn build-storybook && yarn changeset publish"
   },
   "husky": {
