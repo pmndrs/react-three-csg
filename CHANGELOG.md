@@ -1,5 +1,11 @@
 # @react-three/fiber
 
+## 2.1.1
+
+### Patch Changes
+
+- usecsg hook
+
 ## 2.0.7
 
 ### Patch Changes
