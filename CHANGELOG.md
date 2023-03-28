@@ -1,5 +1,11 @@
 # @react-three/fiber
 
+## 2.2.0
+
+### Minor Changes
+
+- d9d8513: chore: update three-bvh-csg
+
 ## 2.1.1
 
 ### Patch Changes
