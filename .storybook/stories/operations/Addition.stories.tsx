@@ -11,10 +11,10 @@ export const Basic = () => (
     <mesh>
       <Geometry>
         <Base position-z={0.5}>
-          <boxBufferGeometry args={[1, 1, 1]} />
+          <boxGeometry args={[1, 1, 1]} />
         </Base>
         <Addition position-z={-0.5}>
-          <sphereBufferGeometry args={[1, 64, 64]} />
+          <sphereGeometry args={[1, 64, 64]} />
         </Addition>
       </Geometry>
       <meshNormalMaterial />
