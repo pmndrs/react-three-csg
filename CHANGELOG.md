@@ -1,5 +1,11 @@
 # @react-three/fiber
 
+## 3.0.0
+
+### Major Changes
+
+- a0eb3053: chore: update three-bvh-csg
+
 ## 2.2.0
 
 ### Minor Changes

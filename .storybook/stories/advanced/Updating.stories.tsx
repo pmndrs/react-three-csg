@@ -20,10 +20,10 @@ const UpdatingExample = () => {
     <mesh>
       <Geometry ref={csg}>
         <Base position={[0, 0, -0.5]} ref={base}>
-          <boxBufferGeometry args={[1, 1, 1]} />
+          <boxGeometry args={[1, 1, 1]} />
         </Base>
         <Subtraction>
-          <sphereBufferGeometry args={[0.45, 64, 64]} />
+          <sphereGeometry args={[0.45, 64, 64]} />
         </Subtraction>
       </Geometry>
       <meshNormalMaterial />
