@@ -1,10 +1,19 @@
 import * as React from 'react'
 import * as THREE from 'three'
 import { extend, ReactThreeFiber } from '@react-three/fiber'
-import { SUBTRACTION, ADDITION, DIFFERENCE, INTERSECTION, Brush as BrushImpl, Evaluator } from 'three-bvh-csg'
+import {
+  SUBTRACTION,
+  ADDITION,
+  DIFFERENCE,
+  INTERSECTION,
+  REVERSE_SUBTRACTION,
+  Brush as BrushImpl,
+  Evaluator,
+} from 'three-bvh-csg'
 
 const TYPES = {
   subtraction: SUBTRACTION,
+  reverseSubtraction: REVERSE_SUBTRACTION,
   addition: ADDITION,
   difference: DIFFERENCE,
   intersection: INTERSECTION,
@@ -147,6 +156,12 @@ export type SubtractionProps = OperationProps
 export type SubtractionRef = BaseRef
 export const Subtraction = React.forwardRef<SubtractionRef, OperationProps>((props, fref) => (
   <Base ref={fref} operator="subtraction" {...props} />
+))
+
+export type ReverseSubtractionProps = OperationProps
+export type ReverseSubtractionRef = BaseRef
+export const ReverseSubtraction = React.forwardRef<ReverseSubtractionRef, OperationProps>((props, fref) => (
+  <Base ref={fref} operator="reverseSubtraction" {...props} />
 ))
 
 export type DifferenceProps = OperationProps
