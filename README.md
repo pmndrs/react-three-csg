@@ -15,7 +15,7 @@ Constructive solid geometry for React, a small abstraction around [gkjohnson/thr
 Begin with a `Geometry` which is a regular `THREE.BufferGeometry` that you can pair with a `mesh`, or anything else that relies on geometry (physics rigid bodies etc).
 
 ```jsx
-import { Geometry, Base, Addition, Subtraction, Intersection, Difference } from '@react-three/csg'
+import { Geometry, Base, Addition, Subtraction, ReverseSubtraction, Intersection, Difference } from '@react-three/csg'
 
 function Cross() {
   return (
@@ -34,8 +34,9 @@ You must first give it a `Base` which is the geometry foundation for all ensuing
 
 Now you chain your operations, as many as you like, but keep in mind that order matters. The following operations are available:
 
-- `Subtraction` subtracts the geometry from the previous
 - `Addition` adds the geometry to the previous
+- `Subtraction` subtracts the geometry from the previous
+- `ReverseSubtraction` subtracts the previous geometry from the geometry
 - `Intersection` is the overlap between the geometry and the previous
 - `Difference` is the negative overlap between the geometry and the previous
 
