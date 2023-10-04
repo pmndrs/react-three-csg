@@ -1,5 +1,12 @@
 # @react-three/fiber
 
+## 3.1.0
+
+### Minor Changes
+
+- d464279: add ReverseSubtraction, introduced in three-bvh-csg 0.0.10
+- d464279: feat: update three-bvh-csg from 0.0.8 to 0.0.10
+
 ## 3.0.0
 
 ### Major Changes
