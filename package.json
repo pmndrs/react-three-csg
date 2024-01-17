@@ -97,7 +97,7 @@
   },
   "homepage": "https://github.com/pmndrs/react-three-csg#readme",
   "dependencies": {
-    "three-bvh-csg": "^0.0.10",
-    "three-mesh-bvh": "^0.6.7"
+    "three-bvh-csg": "^0.0.16",
+    "three-mesh-bvh": "^0.6.8"
   }
 }
