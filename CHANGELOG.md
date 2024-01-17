@@ -1,5 +1,12 @@
 # @react-three/fiber
 
+## 3.2.0
+
+### Minor Changes
+
+- 06266b4: chore(deps): bump three-bvh-csg from 0.0.10 to 0.0.16
+- 06266b4: chore(deps): bump three-mesh-bvh from 0.6.7 to 0.6.8
+
 ## 3.1.0
 
 ### Minor Changes
