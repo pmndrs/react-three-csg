@@ -23,8 +23,8 @@ export class Brush extends BrushImpl {
   operator: keyof typeof TYPES
   showOperation?: boolean
 
-  constructor(operator: keyof typeof TYPES, showOperation?: boolean) {
-    super()
+  constructor(operator: keyof typeof TYPES, showOperation?: boolean, ...args: ConstructorParameters<typeof BrushImpl>) {
+    super(...args)
     this.operator = operator
     this.showOperation = showOperation
   }
