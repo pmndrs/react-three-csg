@@ -88,7 +88,7 @@ export const Geometry = ({
   useGroups = false,
   showOperations = false,
   ref: fref,
-}: { ref: React.RefObject<CSGGeometryRef> } & CSGGeometryProps) => {
+}: { ref?: React.RefObject<CSGGeometryRef> } & CSGGeometryProps) => {
   const geo = React.useRef<THREE.BufferGeometry>(null!)
   const operations = React.useRef<THREE.Group>(null!)
   const ev = React.useMemo(() => Object.assign(new Evaluator(), { useGroups }), [useGroups])
@@ -148,7 +148,7 @@ export const Base = ({
   operator = 'addition',
   ref: fref,
   ...props
-}: { ref: Brush } & BaseProps) => {
+}: { ref?: Brush } & BaseProps) => {
   extend({ Brush: BrushImpl })
   const { showOperations } = React.useContext(csgContext)
   return (
@@ -160,13 +160,13 @@ type OperationProps = Omit<BaseProps, 'operator'>
 
 export type AdditionProps = OperationProps
 export type AdditionRef = BaseRef
-export const Addition = ({ ref: fref, ...props }: { ref: AdditionRef } & AdditionProps) => (
+export const Addition = ({ ref: fref, ...props }: { ref?: AdditionRef } & AdditionProps) => (
   <Base ref={fref} operator="addition" {...props} />
 )
 
 export type SubtractionProps = OperationProps
 export type SubtractionRef = BaseRef
-export const Subtraction = ({ ref: fref, ...props }: { ref: SubtractionRef } & SubtractionProps) => (
+export const Subtraction = ({ ref: fref, ...props }: { ref?: SubtractionRef } & SubtractionProps) => (
   <Base ref={fref} operator="subtraction" {...props} />
 )
 
@@ -175,19 +175,19 @@ export type ReverseSubtractionRef = BaseRef
 export const ReverseSubtraction = ({
   ref: fref,
   ...props
-}: { ref: ReverseSubtractionRef } & ReverseSubtractionProps) => (
+}: { ref?: ReverseSubtractionRef } & ReverseSubtractionProps) => (
   <Base ref={fref} operator="reverseSubtraction" {...props} />
 )
 
 export type DifferenceProps = OperationProps
 export type DifferenceRef = BaseRef
-export const Difference = ({ ref: fref, ...props }: { ref: DifferenceRef } & DifferenceProps) => (
+export const Difference = ({ ref: fref, ...props }: { ref?: DifferenceRef } & DifferenceProps) => (
   <Base ref={fref} operator="difference" {...props} />
 )
 
 export type IntersectionProps = OperationProps
 export type IntersectionRef = BaseRef
-export const Intersection = ({ ref: fref, ...props }: { ref: IntersectionRef } & IntersectionProps) => (
+export const Intersection = ({ ref: fref, ...props }: { ref?: IntersectionRef } & IntersectionProps) => (
   <Base ref={fref} operator="intersection" {...props} />
 )
 
