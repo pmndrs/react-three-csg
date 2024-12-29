@@ -143,7 +143,7 @@ export const Base = ({
   ref: fref,
   ...props
 }: { ref?: Brush } & BaseProps) => {
-  extend({ Brush: BrushImpl })
+  extend({ Brush })
   const { showOperations } = React.useContext(csgContext)
   return (
     <brush operator={operator} raycast={() => null} visible={showOperation || showOperations} ref={fref} {...props} />
