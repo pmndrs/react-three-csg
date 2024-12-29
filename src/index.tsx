@@ -24,6 +24,8 @@ export class Brush extends BrushImpl {
   showOperation?: boolean
 }
 
+const ExtendedBrush = extend(Brush)
+
 declare module '@react-three/fiber' {
   interface ThreeElements {
     brush: ReactThreeFiber.ThreeElement<typeof Brush>
@@ -136,17 +138,21 @@ export const Geometry = ({
 
 export type BaseProps = ThreeElements['brush']
 export type BaseRef = Brush
-// export const Base = React.forwardRef<Brush, BaseProps>(
 export const Base = ({
   showOperation = false,
   operator = 'addition',
   ref: fref,
   ...props
 }: { ref?: Brush } & BaseProps) => {
-  extend({ Brush })
   const { showOperations } = React.useContext(csgContext)
   return (
-    <brush operator={operator} raycast={() => null} visible={showOperation || showOperations} ref={fref} {...props} />
+    <ExtendedBrush
+      operator={operator}
+      raycast={() => null}
+      visible={showOperation || showOperations}
+      ref={fref}
+      {...props}
+    />
   )
 }
 
