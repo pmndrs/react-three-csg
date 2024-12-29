@@ -20,14 +20,8 @@ const TYPES = {
 }
 
 export class Brush extends BrushImpl {
-  operator: keyof typeof TYPES
+  operator: keyof typeof TYPES = 'addition'
   showOperation?: boolean
-
-  constructor(operator: keyof typeof TYPES, showOperation?: boolean, ...args: ConstructorParameters<typeof BrushImpl>) {
-    super(...args)
-    this.operator = operator
-    this.showOperation = showOperation
-  }
 }
 
 declare module '@react-three/fiber' {
