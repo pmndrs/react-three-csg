@@ -1,9 +1,18 @@
 import * as React from 'react'
 import { Vector3 } from 'three'
-import { Canvas, Props as CanvasProps } from '@react-three/fiber'
-import { OrbitControls } from '@react-three/drei'
+import { OrbitControls as OrbitControlsImpl } from 'three-stdlib'
+import { Canvas, CanvasProps, extend, ThreeElement, useThree } from '@react-three/fiber'
 
-type Props = React.PropsWithChildren<
+const OrbitControls = extend(OrbitControlsImpl)
+
+function Controls(props: Omit<ThreeElement<typeof OrbitControlsImpl>, 'args'>) {
+  const gl = useThree((s) => s.gl)
+  const camera = useThree((s) => s.camera)
+
+  return <OrbitControls enableDamping {...props} args={[camera, gl.domElement]} />
+}
+
+export type SetupProps = React.PropsWithChildren<
   CanvasProps & {
     cameraFov?: number
     cameraPosition?: Vector3
@@ -19,7 +28,7 @@ export const Setup = ({
   controls = true,
   lights = true,
   ...restProps
-}: Props) => (
+}: SetupProps) => (
   <Canvas shadows camera={{ position: cameraPosition, fov: cameraFov }} {...restProps}>
     {children}
     {lights && (
@@ -28,6 +37,6 @@ export const Setup = ({
         <pointLight intensity={1} position={[0, 6, 0]} />
       </>
     )}
-    {controls && <OrbitControls />}
+    {controls && <Controls />}
   </Canvas>
 )
