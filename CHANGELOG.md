@@ -1,5 +1,11 @@
 # @react-three/fiber
 
+## 3.3.0
+
+### Minor Changes
+
+- 497d5a3: feat: forward support for React 19
+
 ## 3.2.0
 
 ### Minor Changes
