@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as THREE from 'three'
-import { extend, ReactThreeFiber, ThreeElements } from '@react-three/fiber'
+import { extend } from '@react-three/fiber'
 import {
   SUBTRACTION,
   ADDITION,
@@ -19,14 +19,18 @@ const TYPES = {
   intersection: INTERSECTION,
 }
 
-export class Brush extends BrushImpl {
-  operator: keyof typeof TYPES = 'addition'
+interface BrushProperties {
+  operator: keyof typeof TYPES
   showOperation?: boolean
 }
 
-declare module '@react-three/fiber' {
-  interface ThreeElements {
-    brush: ReactThreeFiber.ThreeElement<typeof Brush>
+export type Brush = BrushImpl & BrushProperties
+
+declare module 'react' {
+  namespace JSX {
+    interface IntrinsicElements {
+      brush: Omit<React.JSX.IntrinsicElements['mesh'], 'ref'> & Partial<BrushProperties & { ref?: React.Ref<Brush> }>
+    }
   }
 }
 
@@ -130,7 +134,7 @@ export const Geometry = React.forwardRef<CSGGeometryRef, CSGGeometryProps>(
   }
 )
 
-export type BaseProps = Omit<ThreeElements['brush'], 'ref'>
+export type BaseProps = React.JSX.IntrinsicElements['brush']
 export type BaseRef = Brush
 export const Base = React.forwardRef<Brush, BaseProps>(
   ({ showOperation = false, operator = 'addition', ...props }, fref) => {
