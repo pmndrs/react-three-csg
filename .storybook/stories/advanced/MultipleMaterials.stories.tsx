@@ -8,7 +8,7 @@ export default {
 
 export const MultipleMaterials = () => {
   return (
-    <Setup>
+    <Setup>      
       <mesh>
         <Geometry useGroups>
           <Base>
@@ -23,7 +23,7 @@ export const MultipleMaterials = () => {
             <sphereGeometry args={[1, 64, 64]} />
             <meshNormalMaterial />
           </Addition>
-        </Geometry>
+        </Geometry>                
       </mesh>
     </Setup>
   )
