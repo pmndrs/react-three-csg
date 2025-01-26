@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Vector3 } from 'three'
-import { Canvas, Props as CanvasProps } from '@react-three/fiber'
+import { Canvas, CanvasProps } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
 
 type Props = React.PropsWithChildren<
@@ -21,7 +21,7 @@ export const Setup = ({
   ...restProps
 }: Props) => (
   <Canvas shadows camera={{ position: cameraPosition, fov: cameraFov }} {...restProps}>
-    {children}
+    {children}    
     {lights && (
       <>
         <ambientLight intensity={0.8} />
