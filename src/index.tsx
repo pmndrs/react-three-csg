@@ -38,6 +38,8 @@ export type CSGGeometryProps = {
   children?: React.ReactNode
   /** Use material groups, each operation can have its own material, default: false */
   useGroups?: boolean
+  /** If true then any group in the final geometry that shares a common material with another group will be merged into one to reduce the number of draw calls required by the resulting mesh. */
+  consolidateGroups?: boolean
   /** Show operation meshes, default: false */
   showOperations?: boolean
   /** Re-compute vertx normals, default: false */
@@ -81,10 +83,16 @@ function resolve(op: THREE.Object3D): Brush {
 const csgContext = React.createContext<CSGGeometryApi>(null!)
 
 export const Geometry = React.forwardRef<CSGGeometryRef, CSGGeometryProps>(
-  ({ children, computeVertexNormals = false, useGroups = false, showOperations = false }, fref) => {
+  (
+    { children, computeVertexNormals = false, useGroups = false, consolidateGroups = false, showOperations = false },
+    fref
+  ) => {
     const geo = React.useRef<THREE.BufferGeometry>(null!)
     const operations = React.useRef<THREE.Group>(null!)
-    const ev = React.useMemo(() => Object.assign(new Evaluator(), { useGroups }), [useGroups])
+    const ev = React.useMemo(
+      () => Object.assign(new Evaluator(), { useGroups, consolidateGroups }),
+      [useGroups, consolidateGroups]
+    )
 
     const update = React.useCallback(() => {
       try {
@@ -106,8 +114,8 @@ export const Geometry = React.forwardRef<CSGGeometryRef, CSGGeometryProps>(
             geo.current.attributes = root.geometry.attributes
             geo.current.groups = root.geometry.groups
             geo.current.drawRange = root.geometry.drawRange
-            if (ev.useGroups && (geo.current as any)?.__r3f?.parent?.material)
-              (geo.current as any).__r3f.parent.material = root.material
+            if (ev.useGroups && (geo.current as any)?.__r3f?.parent?.object?.material)
+              (geo.current as any).__r3f.parent.object.material = root.material
             if (computeVertexNormals) geo.current.computeVertexNormals()
           }
         }
@@ -117,8 +125,8 @@ export const Geometry = React.forwardRef<CSGGeometryRef, CSGGeometryProps>(
     }, [computeVertexNormals, ev])
 
     const api = React.useMemo(
-      () => ({ computeVertexNormals, showOperations, useGroups, update }),
-      [computeVertexNormals, showOperations, useGroups]
+      () => ({ computeVertexNormals, showOperations, useGroups, consolidateGroups, update }),
+      [computeVertexNormals, showOperations, useGroups, consolidateGroups]
     )
     React.useLayoutEffect(() => void update())
     React.useImperativeHandle(fref, () => ({ geometry: geo.current, operations: operations.current, ...api }), [api])

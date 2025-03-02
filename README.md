@@ -53,8 +53,6 @@ Now you chain your operations, as many as you like, but keep in mind that order 
 #### A more complex example
 
 ```jsx
-import * as CSG from '@react-three/csg'
-
 function Shape() {
   return (
     <mesh>
